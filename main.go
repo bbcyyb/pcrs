@@ -1,7 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
+
+var configFile string
+
+func initConfig() {
+	if configFile != "" {
+		viper.SetConfigFile(configFile)
+	}
+}
 
 func main() {
-	fmt.Println("hello world")
+	configFile = "config.yaml"
+	initConfig()
+	fmt.Println("hello world, ", configFile)
 }
