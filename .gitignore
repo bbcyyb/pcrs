@@ -16,3 +16,6 @@
 
 # Runnable file
 main
+
+# Skip temp file in vim
+.*.swp
