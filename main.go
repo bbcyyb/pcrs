@@ -19,6 +19,22 @@ func initConfig() {
 func main() {
 	configFile = "config.yaml"
 	initConfig()
-	log.InitLog()
+	log.SetFormatter(log.JSON)
+	log.SetLevel(log.DebugLevel)
+	log.Errorln("Errorln")
+	log.Warnln("Warnln")
+	log.Infoln("Infoln")
+	log.Debugln("Debugln")
+	log.Traceln("Traceln")
 	fmt.Println("hello world, ", configFile)
+	/*
+		slice, err := log.Refresh()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for _, val := range slice {
+			fmt.Println(val)
+		}
+	*/
 }

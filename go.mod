@@ -3,6 +3,7 @@ module pcrs
 go 1.12
 
 require (
+	github.com/bbcyyb/pcrs v0.0.0-00010101000000-000000000000
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
@@ -13,6 +14,8 @@ require (
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.40.0
+
+	github.com/bbcyyb/pcrs => ./
 	golang.org/x/crypto => github.com/golang/crypto v0.0.0-20190618222545-ea8f1a30c443
 	golang.org/x/exp => github.com/golang/exp v0.0.0-20190510132918-efd6b22b2522
 	golang.org/x/image => github.com/golang/image v0.0.0-20190618124811-92942e4437e2
