@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/ssh/terminal"
-	"golang.org/x/sys/unix"
 )
 
 type Level uint32
@@ -34,11 +32,6 @@ var (
 )
 
 func SetFormatter(formatter Formatter) {
-	if terminal.IsTerminal(unix.Stdout) {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-	} else {
-	}
-
 	switch formatter {
 	case TEXT:
 		logrus.SetFormatter(&logrus.TextFormatter{

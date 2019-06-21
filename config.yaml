@@ -1,1 +1,24 @@
 DatabaseURI: 123
+Hacker: true
+bbcyyb:
+  aaa:
+    xxx: 22.98
+  bbb:
+  - mm
+  - nn
+  ccc:
+    ddd:
+    - 111
+    - 222
+    - 333
+Name: steve
+Hobbies:
+- stkateboarding
+- snowboarding
+- go
+clothing:
+  jacket: leather
+  trousers: denim
+age: 35
+eyes: brown
+beard: true
