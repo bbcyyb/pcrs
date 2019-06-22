@@ -14,10 +14,6 @@ type logger struct {
 	Time    string `json:"time"`
 }
 
-func TestSomething(t *testing.T) {
-	assert.Equal(t, 123, 123, "they should be equal")
-}
-
 func TestDebugJsonLog(t *testing.T) {
 	ass := assert.New(t)
 	buf := &bytes.Buffer{}
@@ -40,12 +36,16 @@ func TestDebugJsonLog(t *testing.T) {
 			switch index {
 			case 0:
 				ass.Equal("error", l.Level)
+				ass.Equal("Errorln", l.Message)
 			case 1:
 				ass.Equal("warning", l.Level)
+				ass.Equal("Warnln", l.Message)
 			case 2:
 				ass.Equal("info", l.Level)
+				ass.Equal("Infoln", l.Message)
 			case 3:
 				ass.Equal("debug", l.Level)
+				ass.Equal("Debugln", l.Message)
 			}
 		}
 	}

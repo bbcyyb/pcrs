@@ -9,6 +9,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+type yamlContent struct {
+	content string
+	prefix  string
+	space   string
+}
+
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Print the site configuration",
@@ -22,12 +28,6 @@ var configCmd = &cobra.Command{
 			fmt.Printf("%s%s%s\n", v.space, v.prefix, v.content)
 		}
 	},
-}
-
-type yamlContent struct {
-	content string
-	prefix  string
-	space   string
 }
 
 func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []*yamlContent {
