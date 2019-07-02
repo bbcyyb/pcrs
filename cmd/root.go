@@ -49,6 +49,8 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Error(err)
 	}
+
+	InitConfig()
 }
 
 func init() {
