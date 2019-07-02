@@ -22,12 +22,24 @@ var configCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		allSettings := viper.AllSettings()
 
-		content := readYamlContentRecursive(allSettings, 0)
+		content := readYamlContent(allSettings)
 
 		for _, v := range content {
-			fmt.Printf("%s%s%s\n", v.space, v.prefix, v.content)
+			fmt.Println(v)
 		}
 	},
+}
+
+func readYamlContent(settings map[string]interface{}) []string {
+	var formattedContent []string
+
+	content := readYamlContentRecursive(settings, 0)
+
+	for _, v := range content {
+		formattedContent = append(formattedContent, fmt.Sprintf("%s%s%s", v.space, v.prefix, v.content))
+	}
+
+	return formattedContent
 }
 
 func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []*yamlContent {
@@ -57,6 +69,7 @@ func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []
 
 			content = append(content, c)
 			for _, val := range settings[k].([]interface{}) {
+				fmt.Println(val)
 				c := &yamlContent{
 					content: fmt.Sprintf("%v", val),
 					prefix:  "- ",
@@ -78,7 +91,7 @@ func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []
 			content = append(content, returnedContent...)
 		} else {
 			c := &yamlContent{
-				content: fmt.Sprintf("%s: \"%+v\"", k, settings[k]),
+				content: fmt.Sprintf("%s: %+v", k, settings[k]),
 				prefix:  "",
 				space:   space,
 			}
@@ -86,6 +99,7 @@ func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []
 			content = append(content, c)
 		}
 	}
+
 	return content
 }
 
