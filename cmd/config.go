@@ -11,10 +11,10 @@ type config struct {
 
 var C *config
 
-func Initconfig() {
+func InitConfig() {
 	log.Debug("Initialize config info for cmd package")
 
-	C = &Config{
+	C = &config{
 		Port: viper.GetInt("port"),
 	}
 

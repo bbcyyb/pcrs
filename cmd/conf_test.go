@@ -2,33 +2,70 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestReadYamlContentRecursive(t *testing.T) {
-	ass := assert.New(t)
-	allSettings := generateAllConfigSettings()
-	formattedContent := readYamlContent(allSettings)
+type ConfTestSuite struct {
+	suite.Suite
+
+	Configs map[string]interface{}
+}
+
+func (self *ConfTestSuite) SetupTest() {
+	self.Configs = generateAllConfigSettings()
+}
+
+func (self *ConfTestSuite) TestReadYamlContent() {
+	ass := assert.New(self.T())
+
+	formattedContent := readYamlContent(self.Configs)
 
 	for _, v := range formattedContent {
 		fmt.Println(v)
 	}
-	ass.Equal(1, 1)
 
-	//TODO: consider use suite component to define the Setup and TearDown functions.
+	ass.Equal("age: 35", formattedContent[0])
+	ass.Equal("bbcyyb:", formattedContent[1])
+	ass.Equal("  aaa:", formattedContent[2])
+	ass.Equal("    xxx: 22.98", formattedContent[3])
+	ass.Equal("  ccc:", formattedContent[7])
+	ass.Equal("    ddd:", formattedContent[8])
+	ass.Equal("    - 111", formattedContent[9])
+	ass.Equal("    - 222", formattedContent[10])
+	ass.Equal("    - 333", formattedContent[11])
+	ass.Equal("  jacket: leather", formattedContent[13])
+	ass.Equal("isBoolean: true", formattedContent[21])
 
+	slice := strings.Split(formattedContent[22], ": ")
+	ass.Equal(2, len(slice))
+	createOn, err := time.Parse(time.RFC3339, slice[1])
+	if ass.Nil(err) {
+		ass.Equal(2020, createOn.Year())
+		ass.Equal(12, (int)(createOn.Month()))
+		ass.Equal(31, createOn.Day())
+		ass.Equal(23, createOn.Hour())
+		ass.Equal(59, createOn.Minute())
+		ass.Equal(59, createOn.Second())
+	}
+}
+
+func TestConfSuite(t *testing.T) {
+	suite.Run(t, new(ConfTestSuite))
 }
 
 func generateAllConfigSettings() map[string]interface{} {
 	root := make(map[string]interface{})
 	root["hacker"] = true
-	root["Name"] = "steve"
+	root["name"] = "steve"
 	root["age"] = 35
-	root["createOn"] = time.Now()
-	root["iso8601"] = time.Date(2020, 12, 31, 23, 59, 59, 0, time.Local)
+	root["createOn"] = time.Now().Format(time.RFC3339)
+	root["iso8601"] = time.Date(2020, 12, 31, 23, 59, 59, 0, time.Local).Format(time.RFC3339)
+	root["isBoolean"] = true
 
 	bbcyyb := make(map[string]interface{})
 	aaa := make(map[string]interface{})

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -21,7 +22,7 @@ var serveCmd = &cobra.Command{
 
 		log.Debug("Declare Group api/v2")
 		api := r.Group("api/v2")
-		routerRegister(api)
+		routes.Register(api)
 
 		api.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, gin.H{
@@ -34,18 +35,6 @@ var serveCmd = &cobra.Command{
 
 		r.Run(address)
 	},
-}
-
-func routerRegister(api *gin.RouterGroup) {
-	registUsers()
-}
-
-func registUsers(api *gin.RouterGroup) {
-	log.Debug("Regist router for Users")
-	users := api.Group("/users")
-	users.GET("", user.GetUsers)
-	users.GET(":userId", user.GetUserById)
-	users.POST("", user.AddUser)
 }
 
 func init() {

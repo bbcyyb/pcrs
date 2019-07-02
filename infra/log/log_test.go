@@ -6,7 +6,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
+
+type LogTestSuite struct {
+	suite.Suite
+}
 
 type logger struct {
 	Level   string `json:"level"`
@@ -14,8 +19,8 @@ type logger struct {
 	Time    string `json:"time"`
 }
 
-func TestDebugJsonLog(t *testing.T) {
-	ass := assert.New(t)
+func (self *LogTestSuite) TestDebugJsonLog() {
+	ass := assert.New(self.T())
 	buf := &bytes.Buffer{}
 	SetFormatter(JSON)
 	SetLevel(DebugLevel)
@@ -51,8 +56,8 @@ func TestDebugJsonLog(t *testing.T) {
 	}
 }
 
-func TestInfoTextLog(t *testing.T) {
-	ass := assert.New(t)
+func (self *LogTestSuite) TestInfoTextLog() {
+	ass := assert.New(self.T())
 	buf := &bytes.Buffer{}
 	SetFormatter(TEXT)
 	SetLevel(InfoLevel)
@@ -82,4 +87,8 @@ func TestInfoTextLog(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestLogSuite(t *testing.T) {
+	suite.Run(t, new(LogTestSuite))
 }

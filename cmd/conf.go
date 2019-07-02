@@ -46,7 +46,6 @@ func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []
 	var content []*yamlContent
 	var keys []string
 	space := ""
-
 	for i := 0; i < hierarchy; i++ {
 		space += "  "
 	}
@@ -68,15 +67,28 @@ func readYamlContentRecursive(settings map[string]interface{}, hierarchy int) []
 			}
 
 			content = append(content, c)
-			for _, val := range settings[k].([]interface{}) {
-				fmt.Println(val)
-				c := &yamlContent{
-					content: fmt.Sprintf("%v", val),
-					prefix:  "- ",
-					space:   space,
-				}
 
-				content = append(content, c)
+			switch settings[k].(type) {
+			case []string:
+				for _, val := range settings[k].([]string) {
+					c := &yamlContent{
+						content: fmt.Sprintf("%v", val),
+						prefix:  "- ",
+						space:   space,
+					}
+
+					content = append(content, c)
+				}
+			case []int:
+				for _, val := range settings[k].([]int) {
+					c := &yamlContent{
+						content: fmt.Sprintf("%v", val),
+						prefix:  "- ",
+						space:   space,
+					}
+
+					content = append(content, c)
+				}
 			}
 		} else if kind == reflect.Map {
 			c := &yamlContent{
