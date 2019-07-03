@@ -10,6 +10,6 @@ func Register(api *gin.RouterGroup) {
 	log.Info("Register middlewares")
 
 	if C.JWT {
-		api.Use(jwt.JWT())
+		api.Use(jwt.JWTAuth())
 	}
 }

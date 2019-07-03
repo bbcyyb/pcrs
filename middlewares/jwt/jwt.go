@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/bbcyyb/pcrs/common"
+	j "github.com/bbcyyb/pcrs/infra/jwt"
 	"github.com/bbcyyb/pcrs/infra/log"
 	"github.com/gin-gonic/gin"
 	//"gin-blog/pkg/util"
 )
 
-func JWT() gin.HandlerFunc {
+func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := verify(c); err != nil {
 			return
@@ -23,7 +24,7 @@ func JWT() gin.HandlerFunc {
 
 func verify(c *gin.Context) (err error) {
 	log.Info("Start to JWT Authenticate.")
-	var code common.Status
+	var code common.Code
 	var data interface{}
 
 	code = common.SUCCESS
@@ -31,7 +32,7 @@ func verify(c *gin.Context) (err error) {
 	if token == "" {
 		code = common.INVALID_PARAMS
 	} else {
-		claims, err := util.ParseToken(token)
+		claims, err := j.ParseToken(token)
 		if err != nil {
 			code = common.ERROR_AUTH_CHECK_TOKEN_FAIL
 		} else if time.Now().Unix() > claims.ExpiresAt {

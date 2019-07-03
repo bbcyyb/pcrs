@@ -1,13 +1,13 @@
 package common
 
-type Status int
+type Code int32
 
 const (
-	SUCCESS        Status = 200
-	ERROR          Status = 500
-	INVALID_PARAMS Status = 400
+	SUCCESS        Code = 200
+	ERROR               = 500
+	INVALID_PARAMS      = 400
 
-	ERROR_AUTH_CHECK_TOKEN_FAIL    Status = 20001
-	ERROR_AUTH_CHECK_TOKEN_TIMEOUT Status = 20002
-	ERROR_AUTH_GEN_TOKEN_FAIL      Status = 20003
+	ERROR_AUTH_CHECK_TOKEN_FAIL    = 20001
+	ERROR_AUTH_CHECK_TOKEN_TIMEOUT = 20002
+	ERROR_AUTH_GEN_TOKEN_FAIL      = 20003
 )

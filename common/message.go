@@ -1,6 +1,6 @@
 package common
 
-var msgFlags = map[Status]string{
+var msgFlags = map[Code]string{
 	SUCCESS:        "OK",
 	ERROR:          "Fail",
 	INVALID_PARAMS: "Request Parameters Error",
@@ -10,7 +10,7 @@ var msgFlags = map[Status]string{
 	ERROR_AUTH_GEN_TOKEN_FAIL:      "Token generation failed",
 }
 
-func GetMsg(code Status) string {
+func GetMsg(code Code) string {
 	if msg, ok := msgFlags[code]; ok {
 		return msg
 	}
