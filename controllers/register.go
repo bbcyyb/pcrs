@@ -1,7 +1,6 @@
-package routes
+package controllers
 
 import (
-	"github.com/bbcyyb/pcrs/controllers"
 	"github.com/bbcyyb/pcrs/infra/log"
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +13,6 @@ func Register(api *gin.RouterGroup) {
 func registerMiscellaneous(api *gin.RouterGroup) {
 	log.Debug("Register Miscellaneous route handler")
 	g := api.Group("/tests")
-	g.GET("/test", controllers.Test)
+	g.GET("/test", Test)
 
 }

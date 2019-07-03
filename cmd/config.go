@@ -12,13 +12,15 @@ type config struct {
 var C *config
 
 func InitConfig() {
-	log.Debug("Initialize config info for cmd package")
+	log.Info("Initialize config info for cmd package")
+
+	port := viper.GetInt("port")
 
 	C = &config{
-		Port: viper.GetInt("port"),
+		Port: port,
 	}
 
-	log.Debug("port is ", viper.GetInt("port"))
+	log.Debug("port is ", port)
 
 	if C.Port == 0 {
 		C.Port = 8080
