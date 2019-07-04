@@ -30,6 +30,9 @@ var serveCmd = &cobra.Command{
 			})
 		})
 
+		// JWT Test
+
+
 		address := "0.0.0.0:" + strconv.Itoa(C.Port)
 		log.Info("Start WebApplication through gin-gonic/gin ", address)
 

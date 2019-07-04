@@ -11,8 +11,8 @@
 ## 3 Flag
 
 
-## 4 The Middlewares
-- JWT
+## 4 The Middleware
+- [jwt-go](https://github.com/dgrijalva/jwt-go): Golang implementation of JSON Web Tokens (JWT)
 
 ## Test
 - [testify](https://github.com/stretchr/testify) : A toolkit with common assertions and mocks that plays nicely with the standard library.

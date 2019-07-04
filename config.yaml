@@ -24,3 +24,7 @@ clothing:
 age: 35
 eyes: brown
 beard: true
+
+jwtSecret: DellEMC
+
+timeOffset: 168 # Hour
