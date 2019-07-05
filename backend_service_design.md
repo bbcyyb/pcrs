@@ -17,37 +17,72 @@
 ### 使用 Table Driven 的方式写测试代码
 
 ```go
-func TestMod(t *testing.T) {
-    tests := []struct {
-        a int
-        b int
-        r int
-                                            hasErr bool
-                                                }{
-                                                            {a: 42, b: 9, r: 6, hasErr: false},
-                                                                    {a: -1, b: 9, r: 8, hasErr: false},
-                                                                            {a: -1, b: -9, r: -1, hasErr: false},
-                                                                                    {a: 42, b: 0, r: 0, hasErr: true},
-                                                                                        }
-
-                                                                                            for row, test := range tests {
-                                                                                                        r, err := Mod(test.a, test.b)
-                                                                                                                if test.hasError {
-                                                                                                                                if err == nil {
-                                                                                                                                                    t.Errorf("should have error, row: %d", row)
-                                                                                                                                                                }
-                                                                                                                                                                            continue
-                                                                                                                                                                                    }
-                                                                                                                                                                                            if err != nil {
-                                                                                                                                                                                                            t.Errorf("should not have error, row: %d", row)
-                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                            if r != test.r {
-                                                                                                                                                                                                                                            t.Errorf("r is expected to be %d but now %d, row: %d", test.r, r, row)
-                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                        }
+func TestMod(t * testing.T) {
+        tests: = [] struct {
+            a int
+            b int
+            r int
+            hasErr bool
+        } {
+            {
+                a: 42,
+                b: 9,
+                r: 6,
+                hasErr: false
+            }, {
+                a: -1,
+                b: 9,
+                r: 8,
+                hasErr: false
+            }, {
+                a: -1,
+                b: -9,
+                r: -1,
+                hasErr: false
+            }, {
+                a: 42,
+                b: 0,
+                r: 0,
+                hasErr: true
+            },
+        }
+    
+        for row, test: = range tests {
+            r, err: = Mod(test.a, test.b)
+            if test.hasError {
+                if err == nil {
+                    t.Errorf("should have error, row: %d", row)
+                }
+                continue
+            }
+            if err != nil {
+                t.Errorf("should not have error, row: %d", row)
+            }
+            if r != test.r {
+                t.Errorf("r is expected to be %d but now %d, row: %d", test.r, r, row)
+            }
+        }
+    }
 ```
 
 ### 使用 testify/assert 简化条件判断
 
+```go
+import "github.com/stretchr/testify/assert"
+
+for row, test := range tests {
+    r, err := Mod(test.a, test.b)
+    if test.hasError {
+        assert.Error(t, err, "row %d", row)
+        continue
+    }
+    assert.NoError(t, err, "row %d", row)
+    assert.Equal(t, test.r, r, "row %d", row)
+}
+```
+
 ### 使用 testify/mock 隔离第三方依赖或者复杂调用
+
+很多时候，测试环境不具备 routine 执行的必要条件。比如查询 consul 里的 KV，即使准备了测试consul，也要先往里面塞测试数据，十分麻烦。又比如查询 AWS S3 的文件列表，每个开发人员一个测试 bucket 太混乱，大家用同一个测试 bucket 更混乱。必须找个方式伪造 consul client 和 AWS S3 client。通过伪造 consul client 查询 KV 的方法，免去连接 consul， 直接返回预设的结果。
+
+testfiy/mock 使得伪造对象的输入输出值可以在运行时决定。更多技巧可看 testify/mock 的文档。
