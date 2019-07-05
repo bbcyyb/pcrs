@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/sys/unix"
 
@@ -13,17 +12,6 @@ var rootCmd = &cobra.Command{
 	Use:   "pcrs",
 	Short: "PowerCalculator Restful Service",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if !terminal.IsTerminal(unix.Stdout) {
-			log.SetFormatter(log.JSON)
-		} else {
-			log.SetFormatter(log.TEXT)
-		}
-
-		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-			log.SetLevel(log.DebugLevel)
-		} else {
-			log.SetLevel(log.InfoLevel)
-		}
 	},
 }
 
@@ -32,29 +20,29 @@ func Execute() (err error) {
 	return
 }
 
-var configFile string
-
-func initConfig() {
-	if configFile != "" {
-		viper.SetConfigFile(configFile)
+func initLogSettings() {
+	if !terminal.IsTerminal(unix.Stdout) {
+		log.SetFormatter(log.JSON)
 	} else {
-		viper.SetConfigName("config")
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("/etc/pcrs")
-		viper.AddConfigPath("$HOME/.pcrs")
+		log.SetFormatter(log.TEXT)
 	}
 
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Error(err)
+	if verbose, _ := rootCmd.Flags().GetBool("verbose"); verbose {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
 	}
 
-	InitConfig()
+	log.Info("Log settings is ready")
 }
 
-func init() {
-	cobra.OnInitialize(initConfig)
+var configFile string
+
+func InitRoot() {
+	cobra.OnInitialize(func() {
+		initLogSettings()
+		InitConfig()
+	})
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "make output more verbose")
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
 }
