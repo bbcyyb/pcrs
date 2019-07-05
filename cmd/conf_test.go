@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,14 +15,18 @@ type ConfTestSuite struct {
 	Configs map[string]interface{}
 }
 
-func (self *ConfTestSuite) SetupTest() {
-	self.Configs = generateAllConfigSettings()
+func TestConfSuite(t *testing.T) {
+	suite.Run(t, new(ConfTestSuite))
 }
 
-func (self *ConfTestSuite) TestReadYamlContent() {
-	ass := assert.New(self.T())
+func (suite *ConfTestSuite) SetupTest() {
+	suite.Configs = testGenerateAllConfigSettings()
+}
 
-	formattedContent := readYamlContent(self.Configs)
+func (suite *ConfTestSuite) TestReadYamlContent() {
+	ass := suite.Assert()
+
+	formattedContent := readYamlContent(suite.Configs)
 
 	for _, v := range formattedContent {
 		fmt.Println(v)
@@ -54,11 +57,7 @@ func (self *ConfTestSuite) TestReadYamlContent() {
 	}
 }
 
-func TestConfSuite(t *testing.T) {
-	suite.Run(t, new(ConfTestSuite))
-}
-
-func generateAllConfigSettings() map[string]interface{} {
+func testGenerateAllConfigSettings() map[string]interface{} {
 	root := make(map[string]interface{})
 	root["hacker"] = true
 	root["name"] = "steve"

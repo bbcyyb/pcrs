@@ -1,27 +1,74 @@
 package jwt
 
 import (
+	"errors"
 	"github.com/bbcyyb/pcrs/common"
-	"github.com/dgrijalva/jwt-go"
+	jg "github.com/dgrijalva/jwt-go"
 	"time"
 )
 
-var jwtSecret []byte
+const (
+	timeOffset      time.Duration = 7 * 24 * time.Hour
+	debugTimeOffset time.Duration = 10 * 365 * 24 * time.Hour
+)
+
+var (
+	jwtSecret []byte = []byte("DELLEMC")
+)
 
 type Claims struct {
-	Id          int             `json:"id"`
-	RsaId       string          `json:"rid"`
-	UserName    string          `json:"un"`
-	Email       string          `json:"em"`
-	Role        common.RuleType `json:"ur"`
-	ExpiredTime float32         `json:"exp"`
-	IsDebug     int             `json:"de"`
-	jwt.StandardClaims
+	Id       int             `json:"id"`
+	RsaId    string          `json:"rid"`
+	UserName string          `json:"un"`
+	Email    string          `json:"em"`
+	Role     common.RoleType `json:"ur"`
+	IsDebug  int             `json:"de"`
+	jg.StandardClaims
 }
 
-func GenerateToken(username, password string) (string, error) {
-	nowTime := time.Now()
-	expireTime := nowTime.Add(3 * time.Hour)
+func GenerateToken(claims *Claims) (token string, err error) {
+	/*
+		nowTime := time.Now()
+		var expireTime time.Time
+		if claims.IsDebug == 0 {
+			expireTime = nowTime.Add(timeOffset)
+		} else {
+			expireTime = nowTime.Add(debugTimeOffset)
+		}
 
-	claims := Claims{}
+		claims.ExpiresAt = expireTime.Unix()
+		claims.Issuer = "powercalculator"
+	*/
+
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknow panic")
+			}
+		}
+	}()
+
+	tokenClaims := jg.NewWithClaims(jg.SigningMethodHS256, *claims)
+	token, err = tokenClaims.SignedString(jwtSecret)
+
+	return
+}
+
+func ParseToken(token string) (*Claims, error) {
+	tokenClaims, err := jg.ParseWithClaims(token, &Claims{}, func(token *jg.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+
+	if tokenClaims != nil {
+		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			return claims, nil
+		}
+	}
+
+	return nil, err
 }
