@@ -10,8 +10,8 @@
 
 ### github.com/spf13/cobra
 
-# The Middlewares
+## JWT
 
-JWT
+### github.com/dgrijalva/jwt-go
 
 

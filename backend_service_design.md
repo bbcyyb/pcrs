@@ -11,3 +11,43 @@
 - 独立于数据库。你可以用 Mongo， BigTable， CouchDB 或者其他数据库来替换 Oracle 或 SQL Server，你的业务规则不要绑定到数据库。
 
 - 独立于外部媒介。 实际上，你的业务规则可以简单到根本不去了解外部世界。
+
+## Golang单元测试
+
+### 使用 Table Driven 的方式写测试代码
+
+```go
+func TestMod(t *testing.T) {
+    tests := []struct {
+        a int
+        b int
+        r int
+                                            hasErr bool
+                                                }{
+                                                            {a: 42, b: 9, r: 6, hasErr: false},
+                                                                    {a: -1, b: 9, r: 8, hasErr: false},
+                                                                            {a: -1, b: -9, r: -1, hasErr: false},
+                                                                                    {a: 42, b: 0, r: 0, hasErr: true},
+                                                                                        }
+
+                                                                                            for row, test := range tests {
+                                                                                                        r, err := Mod(test.a, test.b)
+                                                                                                                if test.hasError {
+                                                                                                                                if err == nil {
+                                                                                                                                                    t.Errorf("should have error, row: %d", row)
+                                                                                                                                                                }
+                                                                                                                                                                            continue
+                                                                                                                                                                                    }
+                                                                                                                                                                                            if err != nil {
+                                                                                                                                                                                                            t.Errorf("should not have error, row: %d", row)
+                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                            if r != test.r {
+                                                                                                                                                                                                                                            t.Errorf("r is expected to be %d but now %d, row: %d", test.r, r, row)
+                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                        }
+```
+
+### 使用 testify/assert 简化条件判断
+
+### 使用 testify/mock 隔离第三方依赖或者复杂调用
