@@ -13,8 +13,12 @@ const (
 )
 
 var (
-	jwtSecret []byte = []byte("DELLEMC")
+	defaultJwtSecret []byte = []byte("DEFAULT")
 )
+
+type JWT struct {
+	jwtSecret []byte
+}
 
 type Claims struct {
 	Id       int             `json:"id"`
@@ -26,7 +30,16 @@ type Claims struct {
 	jg.StandardClaims
 }
 
-func GenerateToken(claims *Claims) (token string, err error) {
+type JWTHandler interface {
+	Generate(*Claims) (string, error)
+	Parse(string) (*Claims, error)
+}
+
+func NewJWT() *JWT {
+	return &JWT{}
+}
+
+func (j *JWT) Generate(claims *Claims) (token string, err error) {
 	/*
 		nowTime := time.Now()
 		var expireTime time.Time
@@ -54,14 +67,14 @@ func GenerateToken(claims *Claims) (token string, err error) {
 	}()
 
 	tokenClaims := jg.NewWithClaims(jg.SigningMethodHS256, *claims)
-	token, err = tokenClaims.SignedString(jwtSecret)
+	token, err = tokenClaims.SignedString(j.jwtSecret)
 
 	return
 }
 
-func ParseToken(token string) (*Claims, error) {
+func (j *JWT) Parse(token string) (*Claims, error) {
 	tokenClaims, err := jg.ParseWithClaims(token, &Claims{}, func(token *jg.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return j.jwtSecret, nil
 	})
 
 	if tokenClaims != nil {
@@ -71,4 +84,8 @@ func ParseToken(token string) (*Claims, error) {
 	}
 
 	return nil, err
+}
+
+func (j *JWT) SetJwtSecret(jwtSecret []byte) {
+	j.jwtSecret = jwtSecret
 }

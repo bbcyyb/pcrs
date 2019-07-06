@@ -12,7 +12,8 @@ func Register(api *gin.RouterGroup) {
 
 func registerMiscellaneous(api *gin.RouterGroup) {
 	log.Debug("Register Miscellaneous route handler")
+	misc := NewMiscllaneous()
 	g := api.Group("/tests")
-	g.GET("/test", Test)
+	g.GET("/test", misc.Test)
 
 }

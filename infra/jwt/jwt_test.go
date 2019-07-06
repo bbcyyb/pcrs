@@ -11,6 +11,7 @@ import (
 type JWTTestSuite struct {
 	suite.Suite
 
+	JWT    *JWT
 	Claims Claims
 	Token  string
 }
@@ -20,6 +21,9 @@ func TestJWTSuite(t *testing.T) {
 }
 
 func (suite *JWTTestSuite) SetupSuite() {
+
+	suite.JWT = NewJWT()
+	suite.JWT.SetJwtSecret([]byte("DELLEMC"))
 
 	claims := Claims{
 		Id:       111,
@@ -42,7 +46,7 @@ func (suite *JWTTestSuite) SetupSuite() {
 func (suite *JWTTestSuite) TestGenerateToken() {
 	ass := suite.Assert()
 
-	token, err := GenerateToken(&(suite.Claims))
+	token, err := suite.JWT.Generate(&(suite.Claims))
 
 	if ass.Nil(err) {
 		ass.Equal(suite.Token, token)
@@ -52,7 +56,7 @@ func (suite *JWTTestSuite) TestGenerateToken() {
 func (suite *JWTTestSuite) TestGenerateTokenFailed() {
 	ass := suite.Assert()
 
-	token, err := GenerateToken(nil)
+	token, err := suite.JWT.Generate(nil)
 
 	ass.Error(err)
 	ass.Empty(token)
@@ -60,7 +64,7 @@ func (suite *JWTTestSuite) TestGenerateTokenFailed() {
 
 func (suite *JWTTestSuite) TestParseToken() {
 	ass := suite.Assert()
-	claims, err := ParseToken(suite.Token)
+	claims, err := suite.JWT.Parse(suite.Token)
 	expectedClaims := suite.Claims
 
 	if ass.Nil(err) {
@@ -73,7 +77,7 @@ func (suite *JWTTestSuite) TestParseTokenFailed() {
 
 	incorrectToken := suite.Token + "123"
 
-	if claims, err := ParseToken(incorrectToken); ass.Nil(claims) && ass.Error(err) {
+	if claims, err := suite.JWT.Parse(incorrectToken); ass.Nil(claims) && ass.Error(err) {
 		ass.Equal("signature is invalid", err.Error())
 	}
 }

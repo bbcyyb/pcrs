@@ -1,8 +1,13 @@
 package cmd
 
 import (
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/sys/unix"
+
+	"github.com/bbcyyb/pcrs/infra/log"
+	mw "github.com/bbcyyb/pcrs/middlewares"
 )
 
 type config struct {
@@ -11,23 +16,40 @@ type config struct {
 
 var C *config
 
-func InitConfig() {
+var rootCmd = &cobra.Command{
+	Use:   "pcrs",
+	Short: "PowerCalculator Restful Service",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if !terminal.IsTerminal(unix.Stdout) {
+			log.SetFormatter(log.JSON)
+		} else {
+			log.SetFormatter(log.TEXT)
+		}
 
+		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
+
+		log.Info("Log settings is ready")
+	},
+}
+
+func initConfig() {
 	if configFile != "" {
 		viper.SetConfigFile(configFile)
-		log.Info("Load config from ", configFile)
 	} else {
 		viper.SetConfigName("config")
 		viper.AddConfigPath(".")
-		viper.AddConfigPath("/etc/pcrs")
+		viper.AddConfigPath("/etc/todos")
 		viper.AddConfigPath("$HOME/.pcrs")
-		log.Info("Load config from default path")
-	}
 
-	viper.AutomaticEnv()
+		viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err != nil {
-		log.Error(err)
+		if err := viper.ReadInConfig(); err != nil {
+			log.Error(err)
+		}
 	}
 
 	log.Info("Initialize config info for cmd package")
@@ -45,6 +67,21 @@ func InitConfig() {
 	}
 }
 
+func Setup() {
+	initConfig()
+
+	mw.Setup()
+}
+
+func Execute() (err error) {
+	err = rootCmd.Execute()
+	return
+}
+
+var configFile string
+
 func init() {
-	InitRoot()
+	cobra.OnInitialize(Setup)
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "make output more verbose")
+	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
 }

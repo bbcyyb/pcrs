@@ -11,7 +11,7 @@ type config struct {
 
 var C *config
 
-func InitConfig() {
+func initConfig() {
 	log.Info("Initalize config info for middlewares package")
 	jwt := viper.GetBool("middlewares.jwt")
 	a := viper.GetInt("databaseURI")
@@ -24,6 +24,6 @@ func InitConfig() {
 	log.Debug("JWT switch is ", jwt)
 }
 
-func init() {
-	InitConfig()
+func Setup() {
+	initConfig()
 }
