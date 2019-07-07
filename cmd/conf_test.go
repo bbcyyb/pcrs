@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -27,10 +26,6 @@ func (suite *ConfTestSuite) TestReadYamlContent() {
 	ass := suite.Assert()
 
 	formattedContent := readYamlContent(suite.Configs)
-
-	for _, v := range formattedContent {
-		fmt.Println(v)
-	}
 
 	ass.Equal("age: 35", formattedContent[0])
 	ass.Equal("bbcyyb:", formattedContent[1])

@@ -20,19 +20,6 @@ var rootCmd = &cobra.Command{
 	Use:   "pcrs",
 	Short: "PowerCalculator Restful Service",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if !terminal.IsTerminal(unix.Stdout) {
-			log.SetFormatter(log.JSON)
-		} else {
-			log.SetFormatter(log.TEXT)
-		}
-
-		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-			log.SetLevel(log.DebugLevel)
-		} else {
-			log.SetLevel(log.InfoLevel)
-		}
-
-		log.Info("Log settings is ready")
 	},
 }
 
@@ -55,21 +42,35 @@ func initConfig() {
 	log.Info("Initialize config info for cmd package")
 
 	port := viper.GetInt("port")
-	log.Debug("Config port is ", port)
+	log.Debug("Config Node port is ", port)
 	C = &config{
 		Port: port,
 	}
-
-	log.Debug("port is ", port)
 
 	if C.Port == 0 {
 		C.Port = 8080
 	}
 }
 
-func Setup() {
-	initConfig()
+func initLog() {
+	if !terminal.IsTerminal(unix.Stdout) {
+		log.SetFormatter(log.JSON)
+	} else {
+		log.SetFormatter(log.TEXT)
+	}
 
+	if verbose, _ := rootCmd.Flags().GetBool("verbose"); verbose {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+
+	log.Info("Log settings is ready")
+}
+
+func Setup() {
+	initLog()
+	initConfig()
 	mw.Setup()
 }
 

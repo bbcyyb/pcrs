@@ -86,3 +86,12 @@ for row, test := range tests {
 很多时候，测试环境不具备 routine 执行的必要条件。比如查询 consul 里的 KV，即使准备了测试consul，也要先往里面塞测试数据，十分麻烦。又比如查询 AWS S3 的文件列表，每个开发人员一个测试 bucket 太混乱，大家用同一个测试 bucket 更混乱。必须找个方式伪造 consul client 和 AWS S3 client。通过伪造 consul client 查询 KV 的方法，免去连接 consul， 直接返回预设的结果。
 
 testfiy/mock 使得伪造对象的输入输出值可以在运行时决定。更多技巧可看 testify/mock 的文档。
+
+
+## 参考案例
+
+https://github.com/theaaf/todos
+
+https://github.com/axiaoxin/pink-lady
+
+https://github.com/gin-contrib?type=source
