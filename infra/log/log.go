@@ -11,6 +11,24 @@ import (
 
 type Level uint32
 type Formatter uint32
+type Fields map[string]interface{}
+
+type Entry struct {
+	CoreEntry logrus.Entry
+}
+
+type EntryHandler interface {
+	Info(args ...interface{})
+	Error(args ...interface{})
+}
+
+func (e *Entry) Info(args ...interface{}) {
+	e.CoreEntry.Info(args...)
+}
+
+func (e *Entry) Error(args ...interface{}) {
+	e.CoreEntry.Error(args...)
+}
 
 const (
 	_ Level = iota
@@ -91,20 +109,12 @@ func Tracef(format string, args ...interface{}) {
 	logrus.Tracef(format, args...)
 }
 
-func Traceln(args ...interface{}) {
-	logrus.Traceln(args...)
-}
-
 func Debug(args ...interface{}) {
 	logrus.Debug(args...)
 }
 
 func Debugf(format string, args ...interface{}) {
 	logrus.Debugf(format, args...)
-}
-
-func Debugln(args ...interface{}) {
-	logrus.Debugln(args...)
 }
 
 func Info(args ...interface{}) {
@@ -115,20 +125,12 @@ func Infof(format string, args ...interface{}) {
 	logrus.Infof(format, args...)
 }
 
-func Infoln(args ...interface{}) {
-	logrus.Infoln(args...)
-}
-
 func Warn(args ...interface{}) {
 	logrus.Warn(args...)
 }
 
 func Warnf(format string, args ...interface{}) {
 	logrus.Warnf(format, args...)
-}
-
-func Warnln(args ...interface{}) {
-	logrus.Warnln(args...)
 }
 
 func Error(args ...interface{}) {
@@ -139,6 +141,9 @@ func Errorf(format string, args ...interface{}) {
 	logrus.Errorf(format, args...)
 }
 
-func Errorln(args ...interface{}) {
-	logrus.Errorln(args...)
+func WithFields(fields Fields) EntryHandler {
+	entry := *logrus.WithFields(logrus.Fields(fields))
+	return &Entry{
+		CoreEntry: entry,
+	}
 }

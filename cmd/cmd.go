@@ -41,7 +41,7 @@ func initConfig() {
 
 	log.Info("Initialize config info for cmd package")
 
-	port := viper.GetInt("port")
+	port := viper.GetInt("database.port")
 	log.Debug("Config Node port is ", port)
 	C = &config{
 		Port: port,

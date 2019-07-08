@@ -1,4 +1,5 @@
-databaseURI: 123
-port: 9090
+database:
+    url: 123
+    port: 9090
 middlewares:
-    jwt: true
+    jwt: false 

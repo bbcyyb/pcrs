@@ -1,4 +1,4 @@
-package jwt
+package middlewares
 
 import (
 	"errors"
@@ -12,6 +12,7 @@ import (
 )
 
 func JWTAuth() gin.HandlerFunc {
+	log.Debug("Register middleware JWTAuth")
 	return func(c *gin.Context) {
 		if err := verify(c); err != nil {
 			return

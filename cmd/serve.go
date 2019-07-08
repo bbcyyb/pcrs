@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/bbcyyb/pcrs/controllers"
 	"github.com/bbcyyb/pcrs/infra/log"
-	mid "github.com/bbcyyb/pcrs/middlewares"
+	"github.com/bbcyyb/pcrs/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -20,11 +20,9 @@ var serveCmd = &cobra.Command{
 		}
 
 		r := gin.Default()
-
-		log.Debug("Declare Group api/v2")
 		api := r.Group("api/v2")
 		controllers.Register(api)
-		mid.Register(api)
+		middlewares.Register(api)
 
 		address := "0.0.0.0:" + strconv.Itoa(C.Port)
 		log.Info("Start WebApplication through gin-gonic/gin ", address)
