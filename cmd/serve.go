@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 		r := gin.Default()
 		api := r.Group("api/v2")
 		controllers.Register(api)
-		middlewares.Register(api)
+		middlewares.Register(r)
 
 		address := "0.0.0.0:" + strconv.Itoa(C.Port)
 		log.Info("Start WebApplication through gin-gonic/gin ", address)

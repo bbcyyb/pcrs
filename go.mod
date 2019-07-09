@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/bbcyyb/pcrs v0.0.0-00010101000000-000000000000
+	github.com/casbin/casbin v1.9.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.4.0
 	github.com/sirupsen/logrus v1.4.2

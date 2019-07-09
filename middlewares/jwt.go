@@ -38,11 +38,13 @@ func verify(c *gin.Context) (err error) {
 			code = common.ERROR_AUTH_CHECK_TOKEN_FAIL
 		} else if time.Now().Unix() > claims.ExpiresAt {
 			code = common.ERROR_AUTH_CHECK_TOKEN_TIMEOUT
+		} else {
+			c.Set("claims", claims)
 		}
 	}
 
 	if code != common.SUCCESS {
-		msg := common.GetMsg(code)
+		msg := common.GetCodeMessage(code)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code": code,
 			"msg":  msg,

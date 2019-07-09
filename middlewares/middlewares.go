@@ -6,20 +6,23 @@ import (
 )
 
 type config struct {
-	JWT bool
+	JWTEnable  bool
+	LogEnable  bool
+	AuthEnable bool
 }
 
 var C *config
 
 func initConfig() {
 	log.Info("Initalize config info for middlewares package")
-	jwt := viper.GetBool("middlewares.jwt")
 
 	C = &config{
-		JWT: jwt,
+		JWTEnable:  viper.GetBool("middlewares.jwt.enable"),
+		LogEnable:  viper.GetBool("middlewares.Log.enable"),
+		AuthEnable: viper.GetBool("middlewares.authorization.enable"),
 	}
 
-	log.Debug("Config Node middlewares.jwt is ", jwt)
+	log.Debug("middlewares Config is ", C)
 }
 
 func Setup() {

@@ -6,8 +6,9 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/sys/unix"
 
+	"github.com/bbcyyb/pcrs/infra"
 	"github.com/bbcyyb/pcrs/infra/log"
-	mw "github.com/bbcyyb/pcrs/middlewares"
+	"github.com/bbcyyb/pcrs/middlewares"
 )
 
 type config struct {
@@ -71,7 +72,11 @@ func initLog() {
 func Setup() {
 	initLog()
 	initConfig()
-	mw.Setup()
+
+	middlewares.Setup()
+	infra.Setup()
+
+	//	Execute()
 }
 
 func Execute() (err error) {

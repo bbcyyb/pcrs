@@ -25,7 +25,7 @@ type Claims struct {
 	RsaId    string          `json:"rid"`
 	UserName string          `json:"un"`
 	Email    string          `json:"em"`
-	Role     common.RoleType `json:"ur"`
+	Role     common.RoleEnum `json:"ur"`
 	IsDebug  int             `json:"de"`
 	jg.StandardClaims
 }
