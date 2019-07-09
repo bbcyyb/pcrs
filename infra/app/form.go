@@ -1,7 +1,6 @@
 package app
 
 import (
-	"gin-blog/pkg/e"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -25,5 +24,5 @@ func BindAndValid(c *gin.Context, form interface{}) (int, int) {
 		return http.StatusBadRequest, 400
 	}
 
-	return http.StatusOK, e.SUCCESS
+	return http.StatusOK, 200
 }
