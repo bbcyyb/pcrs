@@ -3,16 +3,15 @@ module pcrs
 go 1.12
 
 require (
+	github.com/astaxie/beego v1.12.0
 	github.com/bbcyyb/pcrs v0.0.0-00010101000000-000000000000
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.4.0
+	github.com/golang-migrate/migrate/v4 v4.4.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.3.0
-	github.com/golang-migrate/migrate v0.0.0-20190527172536-8437fe6dc6ae
-	golang.org/x/crypto v0.0.0-20190617133340-57b3e21c3d56
-	golang.org/x/sys v0.0.0-20190616124812-15dcb6c0061f
-
 )
 
 replace (

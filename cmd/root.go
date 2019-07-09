@@ -19,12 +19,12 @@ var rootCmd = &cobra.Command{
 		//	log.SetFormatter(log.TEXT)
 		//}
 		log.SetFormatter(log.TEXT)
-
-		if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-			log.SetLevel(log.DebugLevel)
-		} else {
-			log.SetLevel(log.InfoLevel)
-		}
+		log.SetLevel(log.DebugLevel)
+		//if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
+		//	log.SetLevel(log.DebugLevel)
+		//} else {
+		//	log.SetLevel(log.InfoLevel)
+		//}
 	},
 }
 
@@ -56,6 +56,6 @@ func initConfig() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "make output more verbose")
-	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
+	rootCmd.Flags().BoolP("verbose", "v", false, "make output more verbose")
+	rootCmd.Flags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
 }
