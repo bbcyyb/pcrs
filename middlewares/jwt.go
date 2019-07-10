@@ -32,7 +32,7 @@ func verify(c *gin.Context) (err error) {
 	code = common.SUCCESS
 	token := c.Query("token")
 	if token == "" {
-		code = common.INVALID_PARAMS
+		code = common.ERROR_AUTH_CHECK_TOKEN_FAIL
 	} else {
 		if claims, err := jwt.Parse(token); err != nil {
 			code = common.ERROR_AUTH_CHECK_TOKEN_FAIL

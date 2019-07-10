@@ -5,25 +5,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(api *gin.Engine) {
-	//func Register(api *gin.RouterGroup) {
+func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	log.Info("Register middlewares")
 
-	api.Use(func(c *gin.Context) {
-		log.Info("111111111")
-		c.Next()
-		log.Info("222222222")
-	})
-
 	if C.JWTEnable {
-		api.Use(JWTAuth())
+		authGroup.Use(JWTAuth())
 	}
 
 	if C.AuthEnable {
-		api.Use(Authorization())
+		authGroup.Use(Authorization())
 	}
 
 	if C.LogEnable {
-		api.Use(Log())
+		authGroup.Use(Log())
+		group.Use(Log())
 	}
 }

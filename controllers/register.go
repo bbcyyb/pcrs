@@ -1,19 +1,26 @@
 package controllers
 
 import (
+	"github.com/bbcyyb/pcrs/infra/jwt"
 	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/services"
 	"github.com/gin-gonic/gin"
 )
 
-func Register(api *gin.RouterGroup) {
+func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	log.Info("Register restful service route handler")
-	registerMiscellaneous(api)
+
+	registerMiscellaneous(group)
 }
 
-func registerMiscellaneous(api *gin.RouterGroup) {
+func registerMiscellaneous(g *gin.RouterGroup) {
 	log.Debug("Register Miscellaneous route handler")
-	misc := NewMiscllaneous()
-	g := api.Group("/miscs")
-	g.GET("/test", misc.Test)
+	j := jwt.NewJWT()
+	j.SetJwtSecret([]byte("DELLEMC"))
+	token := services.NewToken(j)
+	misc := NewMiscllaneous(token)
 
+	miscG := g.Group("/miscs")
+	miscG.GET("/test", misc.Test)
+	miscG.POST("/token", misc.GenerateTestToken)
 }

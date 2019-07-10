@@ -20,9 +20,12 @@ var serveCmd = &cobra.Command{
 		}
 
 		r := gin.Default()
-		api := r.Group("api/v2")
-		controllers.Register(api)
-		middlewares.Register(r)
+		group := r.Group("api/v2")
+		authGroup := r.Group("api/v2")
+		// The middlewares must be registered before controllers register
+		middlewares.Register(group, authGroup)
+
+		controllers.Register(group, authGroup)
 
 		address := "0.0.0.0:" + strconv.Itoa(C.Port)
 		log.Info("Start WebApplication through gin-gonic/gin ", address)

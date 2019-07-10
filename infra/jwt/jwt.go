@@ -4,12 +4,6 @@ import (
 	"errors"
 	"github.com/bbcyyb/pcrs/common"
 	jg "github.com/dgrijalva/jwt-go"
-	"time"
-)
-
-const (
-	timeOffset      time.Duration = 7 * 24 * time.Hour
-	debugTimeOffset time.Duration = 10 * 365 * 24 * time.Hour
 )
 
 var (
@@ -40,18 +34,6 @@ func NewJWT() *JWT {
 }
 
 func (j *JWT) Generate(claims *Claims) (token string, err error) {
-	/*
-		nowTime := time.Now()
-		var expireTime time.Time
-		if claims.IsDebug == 0 {
-			expireTime = nowTime.Add(timeOffset)
-		} else {
-			expireTime = nowTime.Add(debugTimeOffset)
-		}
-
-		claims.ExpiresAt = expireTime.Unix()
-		claims.Issuer = "powercalculator"
-	*/
 
 	defer func() {
 		if r := recover(); r != nil {
