@@ -8,11 +8,11 @@ import (
 func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	log.Info("Register middlewares")
 
-	if C.JWTEnable {
-		authGroup.Use(JWTAuth())
+	if C.AuthTEnable {
+		authGroup.Use(Authentication())
 	}
 
-	if C.AuthEnable {
+	if C.AuthREnable {
 		authGroup.Use(Authorization())
 	}
 

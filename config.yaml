@@ -2,11 +2,11 @@ database:
     url: 123
     port: 9090
 middlewares:
-    jwt:
+    authentication:
         enable: true
-    log:
-        enable: false
     authorization:
         enable: false
         policy: authpolicy.csv
         model: authmodel.conf
+    log:
+        enable: false

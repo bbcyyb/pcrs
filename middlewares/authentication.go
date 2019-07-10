@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func JWTAuth() gin.HandlerFunc {
+func Authentication() gin.HandlerFunc {
 	log.Debug("Register middleware JWTAuth")
 	return func(c *gin.Context) {
 		if err := verify(c); err != nil {
@@ -25,19 +25,18 @@ func JWTAuth() gin.HandlerFunc {
 func verify(c *gin.Context) (err error) {
 	log.Info("Start to JWT Authenticate.")
 	var code common.Code
-	var data interface{}
 	jwt := infraJ.NewJWT()
 	jwt.SetJwtSecret([]byte("BBCYYB"))
 
 	code = common.SUCCESS
 	token := c.Query("token")
 	if token == "" {
-		code = common.ERROR_AUTH_CHECK_TOKEN_FAIL
+		code = common.ERROR_AUTHT_CHECK_TOKEN_FAIL
 	} else {
 		if claims, err := jwt.Parse(token); err != nil {
-			code = common.ERROR_AUTH_CHECK_TOKEN_FAIL
+			code = common.ERROR_AUTHT_CHECK_TOKEN_FAIL
 		} else if time.Now().Unix() > claims.ExpiresAt {
-			code = common.ERROR_AUTH_CHECK_TOKEN_TIMEOUT
+			code = common.ERROR_AUTHT_CHECK_TOKEN_TIMEOUT
 		} else {
 			c.Set("claims", claims)
 		}
@@ -45,14 +44,9 @@ func verify(c *gin.Context) (err error) {
 
 	if code != common.SUCCESS {
 		msg := common.GetCodeMessage(code)
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code": code,
-			"msg":  msg,
-			"data": data,
-		})
 
-		c.Abort()
 		err = errors.New(msg)
+		c.AbortWithError(http.StatusUnauthorized, err)
 		log.Debug("JWT verification failed, error message: ", msg)
 	}
 

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bbcyyb/pcrs/common"
@@ -18,7 +19,8 @@ func Authorization() gin.HandlerFunc {
 		role := getRole(c)
 		roleMessage := common.GetRoleEnumMessage(role)
 		if !auth.CheckPermission(roleMessage, c.Request) {
-			c.AbortWithStatus(http.StatusForbidden)
+			err := errors.New(common.ERROR_AUTHR_CHECK_PERMISSION_FAIL)
+			c.AbortWithError(http.StatusForBidden, err)
 		}
 
 		c.Next()

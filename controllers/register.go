@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Base struct {
+	claims *jwt.Claims
+}
+
 func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	log.Info("Register restful service route handler")
 

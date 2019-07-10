@@ -15,6 +15,7 @@ const (
 )
 
 type Miscellaneous struct {
+	Base
 	tokenHandler services.TokenHandler
 }
 
