@@ -19,8 +19,8 @@ func Authorization() gin.HandlerFunc {
 		role := getRole(c)
 		roleMessage := common.GetRoleEnumMessage(role)
 		if !auth.CheckPermission(roleMessage, c.Request) {
-			err := errors.New(common.ERROR_AUTHR_CHECK_PERMISSION_FAIL)
-			c.AbortWithError(http.StatusForBidden, err)
+			err := errors.New(common.GetCodeMessage(common.ERROR_AUTHR_CHECK_PERMISSION_FAIL))
+			c.AbortWithError(http.StatusForbidden, err)
 		}
 
 		c.Next()

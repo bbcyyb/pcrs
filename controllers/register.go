@@ -7,10 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Base struct {
-	claims *jwt.Claims
-}
-
 func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	log.Info("Register restful service route handler")
 
@@ -21,10 +17,10 @@ func registerMiscellaneous(g *gin.RouterGroup) {
 	log.Debug("Register Miscellaneous route handler")
 	j := jwt.NewJWT()
 	j.SetJwtSecret([]byte("DELLEMC"))
-	token := services.NewToken(j)
-	misc := NewMiscllaneous(token)
+	tokenSvc := services.NewToken(j)
+	miscController := NewMiscllaneous(tokenSvc)
 
 	miscG := g.Group("/miscs")
-	miscG.GET("/test", misc.Test)
-	miscG.POST("/token", misc.GenerateTestToken)
+	miscG.GET("/test", miscController.Test)
+	miscG.POST("/tokens", miscController.GenerateTestToken)
 }

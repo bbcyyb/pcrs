@@ -15,7 +15,6 @@ const (
 )
 
 type Miscellaneous struct {
-	Base
 	tokenHandler services.TokenHandler
 }
 
@@ -26,6 +25,7 @@ func NewMiscllaneous(tokenHandler services.TokenHandler) *Miscellaneous {
 }
 
 func (misc *Miscellaneous) Test(c *gin.Context) {
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Hello World!",
 	})
