@@ -1,17 +1,22 @@
 # The 3rd Components
 
-## Configuration
+## 1 Tools (Configuration, Logger)
+- [logrus](https://github.com/sirupsen/logrus):
+ Logrus is a structured logger for Go (golang), completely API compatible with the standard library logger.
+- [cobra](https://github.com/spf13/cobra): Cobra is both a library for creating powerful modern CLI applications as well as a program to generate applications and command files.
+- [viper](https://github.com/spf13/viper): Viper is a complete configuration solution for Go applications including 12-Factor apps. 
 
-### github.com/spf13/viper
+## 2 Web Framework
 
-## Web Framework
+## 3 Flag
 
-## Flag
 
-### github.com/spf13/cobra
+## 4 The Middleware
+- [jwt-go](https://github.com/dgrijalva/jwt-go): Golang implementation of JSON Web Tokens (JWT)
 
-## JWT
+## Test
+- [testify](https://github.com/stretchr/testify) : A toolkit with common assertions and mocks that plays nicely with the standard library.
 
-### github.com/dgrijalva/jwt-go
+
 
 
