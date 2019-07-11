@@ -19,3 +19,6 @@ main
 
 # Skip temp file in vim
 .*.swp
+
+# Skip idea
+.idea/*
