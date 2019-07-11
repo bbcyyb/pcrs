@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	. "github.com/bbcyyb/pcrs/infra/logger"
 	"github.com/bbcyyb/pcrs/infra/migrate"
 	migrateV4 "github.com/golang-migrate/migrate/v4"
 	"os"
@@ -28,7 +28,7 @@ var (
 	source      string
 	migrater    *migrateV4.Migrate
 	migraterErr error
-	startTime time.Time
+	startTime   time.Time
 )
 
 /**
@@ -40,13 +40,14 @@ var (
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "migrate database",
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		log.Debugf("Inside migrateCmd PersistentPreRun with args: %v", strings.Join(args, " "))
+
+		Logger.Debugf("Inside migrateCmd PersistentPreRun with args: %v", strings.Join(args, " "))
 		preRun()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("migrateCmd arguments : %v", strings.Join(args, " "))
+		Logger.Debugf("migrateCmd arguments : %v", strings.Join(args, " "))
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		postRun()
@@ -80,7 +81,7 @@ var gotoCmd = &cobra.Command{
 	Short: "migrate to specified version",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Debugf("goto command args: %v", strings.Join(args, " "))
+		Logger.Debugf("goto command args: %v", strings.Join(args, " "))
 		migrate.ExecuteGoto(migrater, args[0])
 	},
 }
@@ -95,11 +96,11 @@ var lookCmd = &cobra.Command{
 }
 
 func preRun() {
-	log.Debugf("help:%v, version:%v, prefetch:%v, lockTimeout:%v, path:%v, database:%v, source:%v\n",
+	Logger.Debugf("help:%v, version:%v, prefetch:%v, lockTimeout:%v, path:%v, database:%v, source:%v\n",
 		help, version, prefetch, lockTimeout, path, database, source)
 
 	if version {
-		log.Infof("migrate version is %v", migrateVersion)
+		Logger.Infof("migrate version is %v", migrateVersion)
 		os.Exit(0)
 	}
 
@@ -111,7 +112,7 @@ func preRun() {
 	// initialize migrate
 	migrater, migraterErr = migrateV4.New(source, database)
 	if migraterErr == nil {
-		//migrater.Log = log // TODO
+		//migrater.Log = Logger // TODO
 		migrater.PrefetchMigrations = prefetch
 		migrater.LockTimeout = time.Duration(int64(lockTimeout)) * time.Second
 
@@ -126,18 +127,18 @@ func preRun() {
 			}
 		}()
 	} else {
-		log.Errorf("preRun: %v", migraterErr)
+		Logger.Errorf("preRun: %v", migraterErr)
 		os.Exit(-1)
 	}
 	startTime = time.Now()
 }
 
 func postRun() {
-	log.Infof("Finished after %v", time.Since(startTime))
+	Logger.Infof("Finished after %v", time.Since(startTime))
 	defer func() {
 		if migraterErr == nil {
 			if _, err := migrater.Close(); err != nil {
-				log.Errorf("MigrateError:%v", err)
+				Logger.Errorf("MigrateError:%v", err)
 				fmt.Println(err)
 			}
 		}
@@ -145,7 +146,6 @@ func postRun() {
 }
 
 func init() {
-	log.Info("migrate start...")
 	migrateCmd.Flags().BoolVarP(&help, "help", "h", false, "Print usage")
 	migrateCmd.Flags().BoolVarP(&version, "version", "v", false, "Print version")
 	migrateCmd.PersistentFlags().UintVarP(&prefetch, "prefetch", "f", 10, "Number of migrations to load in advance before executing (default 10)")

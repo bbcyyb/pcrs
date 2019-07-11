@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"github.com/bbcyyb/pcrs/infra/log"
+	. "github.com/bbcyyb/pcrs/infra/logger"
+	"github.com/bbcyyb/pcrs/middlewares"
 	"github.com/bbcyyb/pcrs/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -17,9 +19,9 @@ var serveCmd = &cobra.Command{
 		} else {
 			gin.SetMode(gin.ReleaseMode)
 		}
-
+		gin.SetMode(gin.DebugMode)
 		r := gin.Default()
-
+		r.Use(middlewares.LoggerHandler(*Logger))
 		log.Debug("Declare Group api/v2")
 		api := r.Group("api/v2")
 		routes.Register(api)
@@ -31,7 +33,6 @@ var serveCmd = &cobra.Command{
 		})
 
 		// JWT Test
-
 
 		address := "0.0.0.0:" + strconv.Itoa(C.Port)
 		log.Info("Start WebApplication through gin-gonic/gin ", address)
