@@ -9,6 +9,7 @@ const (
 
 	ERROR_AUTHT_CHECK_TOKEN_FAIL Code = iota + 20001
 	ERROR_AUTHT_CHECK_TOKEN_TIMEOUT
+	ERROR_AUTHT_CHECK_TOKEN_MISS
 	ERROR_AUTHT_GEN_TOKEN_FAIL
 	ERROR_AUTHR_CHECK_PERMISSION_FAIL
 )
@@ -20,6 +21,7 @@ var codeFlags = map[Code]string{
 
 	ERROR_AUTHT_CHECK_TOKEN_FAIL:      "Authentication has been denied for this request.",
 	ERROR_AUTHT_CHECK_TOKEN_TIMEOUT:   "Authentication Token has timed out",
+	ERROR_AUTHT_CHECK_TOKEN_MISS:      "Authentication is required",
 	ERROR_AUTHT_GEN_TOKEN_FAIL:        "Authentication Token generation failed",
 	ERROR_AUTHR_CHECK_PERMISSION_FAIL: "Authorize permission fail",
 }

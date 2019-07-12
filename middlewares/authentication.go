@@ -29,9 +29,9 @@ func verify(c *gin.Context) (err error) {
 	jwt.SetJwtSecret([]byte("BBCYYB"))
 
 	code = common.SUCCESS
-	token := c.Query("token")
+	token := c.GetHeader("X-Authorization")
 	if token == "" {
-		code = common.ERROR_AUTHT_CHECK_TOKEN_FAIL
+		code = common.ERROR_AUTHT_CHECK_TOKEN_MISS
 	} else {
 		if claims, err := jwt.Parse(token); err != nil {
 			code = common.ERROR_AUTHT_CHECK_TOKEN_FAIL
