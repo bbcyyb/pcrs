@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	. "github.com/bbcyyb/pcrs/common"
 	"github.com/bbcyyb/pcrs/infra/jwt"
 	"github.com/bbcyyb/pcrs/services"
 	"github.com/gin-gonic/gin"
 
-	"net/http"
 	"time"
 )
 
@@ -25,8 +25,7 @@ func NewMiscllaneous(tokenHandler services.TokenHandler) *Miscellaneous {
 }
 
 func (misc *Miscellaneous) Test(c *gin.Context) {
-
-	c.JSON(http.StatusOK, gin.H{
+	OK(c, gin.H{
 		"message": "Hello World!",
 	})
 }
@@ -34,7 +33,7 @@ func (misc *Miscellaneous) Test(c *gin.Context) {
 func (misc *Miscellaneous) GenerateTestToken(c *gin.Context) {
 	var claims jwt.Claims
 	if err := c.BindJSON(&claims); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		BadRequest(c, err)
 		return
 	}
 
@@ -51,10 +50,10 @@ func (misc *Miscellaneous) GenerateTestToken(c *gin.Context) {
 
 	token, err := misc.tokenHandler.GenerateToken(&claims)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		InternalServerError(c, err)
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"message": token,
+		OK(c, gin.H{
+			"token": token,
 		})
 	}
 }

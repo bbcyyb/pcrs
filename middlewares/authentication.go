@@ -15,7 +15,7 @@ func Authentication() gin.HandlerFunc {
 	log.Debug("Register middleware JWTAuth")
 	return func(c *gin.Context) {
 		if err := verify(c); err != nil {
-			return
+			c.AbortWithError(http.StatusUnauthorized, err)
 		}
 
 		c.Next()
@@ -46,8 +46,7 @@ func verify(c *gin.Context) (err error) {
 		msg := common.GetCodeMessage(code)
 
 		err = errors.New(msg)
-		c.AbortWithError(http.StatusUnauthorized, err)
-		log.Debug("JWT verification failed, error message: ", msg)
+		log.Error("JWT verification failed, error message: ", err)
 	}
 
 	return
