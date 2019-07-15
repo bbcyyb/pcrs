@@ -8,7 +8,7 @@ import (
 
 type Response struct {
 	Code    int         `json:"code"`
-	Message interface{} `json:"message,omitempty"`
+	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
@@ -30,35 +30,39 @@ func NoContent(c *gin.Context) {
 
 func BadRequest(c *gin.Context, err error) {
 	c.AbortWithError(http.StatusBadRequest, err)
-	Respond(c, http.StatusBadRequest, nil, nil)
+	Respond(c, http.StatusBadRequest, nil, err)
 }
 
 func Unauthorized(c *gin.Context, err error) {
 	c.AbortWithError(http.StatusUnauthorized, err)
-	Respond(c, http.StatusUnauthorized, nil, nil)
+	Respond(c, http.StatusUnauthorized, nil, err)
 }
 
 func Forbidden(c *gin.Context, err error) {
 	c.AbortWithError(http.StatusForbidden, err)
-	Respond(c, http.StatusForbidden, nil, nil)
+	Respond(c, http.StatusForbidden, nil, err)
 }
 
 func NotFound(c *gin.Context, err error) {
 	c.AbortWithError(http.StatusNotFound, err)
-	Respond(c, http.StatusNotFound, nil, nil)
+	Respond(c, http.StatusNotFound, nil, err)
 }
 
 func InternalServerError(c *gin.Context, err error) {
 	c.AbortWithError(http.StatusInternalServerError, err)
-	Respond(c, http.StatusInternalServerError, nil, nil)
+	Respond(c, http.StatusInternalServerError, nil, err)
 }
 
 func Respond(c *gin.Context, status int, data interface{}, err error) {
 
 	resp := Response{
 		Code:    status,
-		Message: err,
+		Message: "",
 		Data:    data,
+	}
+
+	if err != nil {
+		resp.Message = err.Error()
 	}
 
 	if gin.Mode() == gin.ReleaseMode {
