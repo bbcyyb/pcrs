@@ -53,7 +53,7 @@ func (suite *AuthorizerTestSuite) SetupSuite() {
 	suite.NegativeCases = []Case{
 		Case{"admin", "/get", "HEAD"},
 		Case{"design", "/any", "POST"},
-		Case{"user", "/put", "PUT"},
+		Case{"user", "/put", "HEAD"},
 		Case{"anonymity", "/post", "POST"},
 		Case{"anonymity", "/login", "POST"},
 	}
@@ -64,7 +64,7 @@ func (suite *AuthorizerTestSuite) TestCheckPermission() {
 
 	for i, c := range suite.PositiveCases {
 		req, _ := http.NewRequest(c.Method, c.Route, nil)
-		ass.Truef(suite.Auth.CheckPermission(c.Role, req), "error sequence number: %v", i)
+		ass.Truef(suite.Auth.CheckPermission(c.Role, req), "error sequence number: %v", i+1)
 	}
 }
 

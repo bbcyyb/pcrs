@@ -26,11 +26,11 @@ func (self *LogTestSuite) TestDebugJsonLog() {
 	SetLevel(DebugLevel)
 	SetOutput(buf)
 
-	Errorln("Errorln")
-	Warnln("Warnln")
-	Infoln("Infoln")
-	Debugln("Debugln")
-	Traceln("Traceln")
+	Error("Errorln")
+	Warn("Warnln")
+	Info("Infoln")
+	Debug("Debugln")
+	Trace("Traceln")
 
 	slice, err := refresh()
 	if ass.NoError(err) {
