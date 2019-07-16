@@ -5,17 +5,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-type config struct {
+type Config struct {
 	AuthPolicyFile string
 	AuthModelFile  string
 }
 
-var C *config
+var C *Config
 
 func initConfig() {
 	log.Info("Initalize config info for infra package")
 
-	C = &config{
+	C = &Config{
 		AuthPolicyFile: viper.GetString("middlewares.authorization.policy"),
 		AuthModelFile:  viper.GetString("middlewares.authorization.model"),
 	}

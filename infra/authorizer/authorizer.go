@@ -16,10 +16,6 @@ func NewBasicAuthorizer() *BasicAuthorizer {
 	return &BasicAuthorizer{enforcer: e}
 }
 
-type Authorizer interface {
-	CheckPermission(http.Request) bool
-}
-
 func (a *BasicAuthorizer) CheckPermission(user string, r *http.Request) bool {
 	method := r.Method
 	path := r.URL.Path

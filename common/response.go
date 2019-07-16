@@ -20,8 +20,8 @@ func Created(c *gin.Context, data interface{}) {
 	Respond(c, http.StatusCreated, data, nil)
 }
 
-func Accepted(c *gin.Context) {
-	Respond(c, http.StatusAccepted, nil, nil)
+func Accepted(c *gin.Context, data interface{}) {
+	Respond(c, http.StatusAccepted, data, nil)
 }
 
 func NoContent(c *gin.Context) {
