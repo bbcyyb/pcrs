@@ -3,11 +3,13 @@ module pcrs
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/bbcyyb/pcrs v0.0.0-00010101000000-000000000000
 	github.com/casbin/casbin v1.9.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.4.0
 	github.com/golang-migrate/migrate/v4 v4.4.0
+	github.com/jinzhu/gorm v1.9.10
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
