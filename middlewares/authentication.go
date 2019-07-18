@@ -26,7 +26,7 @@ func verify(c *gin.Context) (err error) {
 	log.Info("Start to JWT Authenticate.")
 	var code common.Code
 	jwt := infraJ.NewJWT()
-	jwt.SetJwtSecret([]byte("BBCYYB"))
+	jwt.SetJwtSecret([]byte("DELLEMC"))
 
 	code = common.SUCCESS
 	token := c.GetHeader("X-Authorization")
