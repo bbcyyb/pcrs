@@ -61,6 +61,11 @@ func (j *JWT) Parse(token string) (*Claims, error) {
 
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			if claims.ExpiresAt > 1000000000000 {
+				// if expire time length is 13, the first 10 bits need to be intercepted.
+				claims.ExpiresAt /= 1000
+			}
+
 			return claims, nil
 		}
 	}

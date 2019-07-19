@@ -1,4 +1,4 @@
-package infra
+package pkg
 
 import (
 	"github.com/bbcyyb/pcrs/infra/log"

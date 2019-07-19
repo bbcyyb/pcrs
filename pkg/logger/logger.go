@@ -11,7 +11,7 @@ import (
 
 type logConfig struct {
 	Environment  string
-	Formatter     string
+	Formatter    string
 	Level        string
 	ExportCaller bool
 	LogFilePath  string
@@ -29,7 +29,7 @@ func init() {
 func initConfig() {
 	config = &logConfig{
 		Environment:  viper.GetString("environment"),
-		Formatter:     viper.GetString("formatter"),
+		Formatter:    viper.GetString("formatter"),
 		Level:        viper.GetString("level"),
 		ExportCaller: viper.GetBool("exportCaller"),
 		LogFilePath:  viper.GetString("logFilePath"),
@@ -55,7 +55,7 @@ func initLogToStdoutDebug() {
 	Logger.SetFormatter(&log.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
-		TimestampFormat: time.RFC3339Nano,})
+		TimestampFormat: time.RFC3339Nano})
 	Logger.SetOutput(os.Stdout)
 	Logger.SetReportCaller(true)
 }
@@ -86,4 +86,3 @@ func initWarnLogToFile() {
 	writer := bufio.NewWriter(f)
 	Logger.SetOutput(writer)
 }
-
