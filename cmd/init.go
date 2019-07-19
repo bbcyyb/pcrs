@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/bbcyyb/pcrs-master/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
@@ -75,6 +76,7 @@ func Setup() {
 
 	middlewares.Setup()
 	pkg.Setup()
+	logger.Setup()
 
 	//	Execute()
 }

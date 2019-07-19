@@ -43,11 +43,11 @@ var migrateCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 
-		Logger.Debugf("Inside migrateCmd PersistentPreRun with args: %v", strings.Join(args, " "))
+		Log.Debugf("Inside migrateCmd PersistentPreRun with args: %v", strings.Join(args, " "))
 		preRun()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Debugf("migrateCmd arguments : %v", strings.Join(args, " "))
+		Log.Debugf("migrateCmd arguments : %v", strings.Join(args, " "))
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		postRun()
@@ -81,7 +81,7 @@ var gotoCmd = &cobra.Command{
 	Short: "migrate to specified version",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Debugf("goto command args: %v", strings.Join(args, " "))
+		Log.Debugf("goto command args: %v", strings.Join(args, " "))
 		migrate.ExecuteGoto(migrater, args[0])
 	},
 }
@@ -96,11 +96,11 @@ var lookCmd = &cobra.Command{
 }
 
 func preRun() {
-	Logger.Debugf("help:%v, version:%v, prefetch:%v, lockTimeout:%v, path:%v, database:%v, source:%v\n",
+	Log.Debugf("help:%v, version:%v, prefetch:%v, lockTimeout:%v, path:%v, database:%v, source:%v\n",
 		help, version, prefetch, lockTimeout, path, database, source)
 
 	if version {
-		Logger.Infof("migrate version is %v", migrateVersion)
+		Log.Infof("migrate version is %v", migrateVersion)
 		os.Exit(0)
 	}
 
@@ -127,18 +127,18 @@ func preRun() {
 			}
 		}()
 	} else {
-		Logger.Errorf("preRun: %v", migraterErr)
+		Log.Errorf("preRun: %v", migraterErr)
 		os.Exit(-1)
 	}
 	startTime = time.Now()
 }
 
 func postRun() {
-	Logger.Infof("Finished after %v", time.Since(startTime))
+	Log.Infof("Finished after %v", time.Since(startTime))
 	defer func() {
 		if migraterErr == nil {
 			if _, err := migrater.Close(); err != nil {
-				Logger.Errorf("MigrateError:%v", err)
+				Log.Errorf("MigrateError:%v", err)
 				fmt.Println(err)
 			}
 		}
