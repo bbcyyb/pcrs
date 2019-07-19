@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	. "github.com/bbcyyb/pcrs/infra/logger"
-	"github.com/bbcyyb/pcrs/infra/migrate"
+	. "github.com/bbcyyb/pcrs/pkg/logger"
+	"github.com/bbcyyb/pcrs/pkg/migrate"
 	migrateV4 "github.com/golang-migrate/migrate/v4"
 	"os"
 	"os/signal"

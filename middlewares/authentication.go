@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/bbcyyb/pcrs/common"
-	infraJ "github.com/bbcyyb/pcrs/infra/jwt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ func Authentication() gin.HandlerFunc {
 func verify(c *gin.Context) (err error) {
 	log.Info("Start to JWT Authenticate.")
 	var code common.Code
-	jwt := infraJ.NewJWT()
+	jwt := pkgJ.NewJWT()
 	jwt.SetJwtSecret([]byte("DELLEMC"))
 
 	code = common.SUCCESS

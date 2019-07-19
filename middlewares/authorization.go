@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/bbcyyb/pcrs/common"
-	"github.com/bbcyyb/pcrs/infra/authorizer"
-	"github.com/bbcyyb/pcrs/infra/jwt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/pkg/authorizer"
+	"github.com/bbcyyb/pcrs/pkg/jwt"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/bbcyyb/pcrs/infra/jwt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/pkg/jwt"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/bbcyyb/pcrs/services"
 	"github.com/gin-gonic/gin"
 )

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	. "github.com/bbcyyb/pcrs/common"
-	"github.com/bbcyyb/pcrs/infra/jwt"
+	"github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/bbcyyb/pcrs/services"
 	"github.com/gin-gonic/gin"
 

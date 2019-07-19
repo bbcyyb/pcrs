@@ -3,7 +3,7 @@ package authorizer
 import (
 	"net/http"
 
-	"github.com/bbcyyb/pcrs/infra"
+	"github.com/bbcyyb/pcrs/pkg"
 	"github.com/casbin/casbin"
 )
 
@@ -12,7 +12,7 @@ type BasicAuthorizer struct {
 }
 
 func NewBasicAuthorizer() *BasicAuthorizer {
-	e := casbin.NewEnforcer(infra.C.AuthModelFile, infra.C.AuthPolicyFile)
+	e := casbin.NewEnforcer(pkg.C.AuthModelFile, pkg.C.AuthPolicyFile)
 	return &BasicAuthorizer{enforcer: e}
 }
 

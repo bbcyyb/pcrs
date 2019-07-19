@@ -3,7 +3,7 @@ package migrate
 import (
 	"errors"
 	"fmt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	migrateV4 "github.com/golang-migrate/migrate/v4"
 	"strconv"
 	"strings"

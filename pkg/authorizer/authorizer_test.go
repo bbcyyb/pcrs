@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/bbcyyb/pcrs/infra"
+	"github.com/bbcyyb/pcrs/pkg"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -32,12 +32,12 @@ func (suite *AuthorizerTestSuite) SetupSuite() {
 
 	_, filename, _, _ := runtime.Caller(0)
 	dir := path.Dir(filename)
-	infra.C = &infra.Config{
+	pkg.C = &pkg.Config{
 		AuthPolicyFile: path.Join(dir, "auth_policy_test.csv"),
 		AuthModelFile:  path.Join(dir, "auth_model_test.conf"),
 	}
 
-	ass.FileExists(infra.C.AuthModelFile)
+	ass.FileExists(pkg.C.AuthModelFile)
 
 	suite.Auth = NewBasicAuthorizer()
 	ass.NotNil(suite.Auth)

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 

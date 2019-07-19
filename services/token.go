@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/bbcyyb/pcrs/infra/jwt"
+	"github.com/bbcyyb/pcrs/pkg/jwt"
 )
 
 type Token struct {

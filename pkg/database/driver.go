@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bbcyyb/pcrs/infra/log"
+	"github.com/bbcyyb/pcrs/pkg/log"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/bbcyyb/pcrs/common"
-	infraJ "github.com/bbcyyb/pcrs/infra/jwt"
-	"github.com/bbcyyb/pcrs/infra/log"
+	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
@@ -43,7 +43,7 @@ func (suite *AuthenticationTestSuite) TestAuthentication() {
 
 	value := suite.C.MustGet("claims")
 	if ass.NotNil(value) {
-		claims := value.(*infraJ.Claims)
+		claims := value.(*pkgJ.Claims)
 		ass.NotNil(claims)
 		ass.Equal(111, claims.Id)
 		ass.Equal("Dev", claims.UserName)
@@ -65,7 +65,7 @@ func (suite *AuthenticationTestSuite) TestAuthenticationToMatchLegacyTokenFormat
 
 	value := suite.C.MustGet("claims")
 	if ass.NotNil(value) {
-		claims := value.(*infraJ.Claims)
+		claims := value.(*pkgJ.Claims)
 		ass.NotNil(claims)
 		ass.Equal(10486, claims.Id)
 		ass.Equal("Kevin Yabing", claims.UserName)

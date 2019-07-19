@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/bbcyyb/pcrs/controllers"
-	"github.com/bbcyyb/pcrs/infra/log"
 	"github.com/bbcyyb/pcrs/middlewares"
+	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"strconv"
