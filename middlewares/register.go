@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,8 @@ func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	group.Use(ErrorHandler())
 
 	if C.AuthTEnable {
-		authGroup.Use(Authentication())
+		jwt := pkgJ.NewJWT()
+		authGroup.Use(Authentication(jwt))
 	}
 
 	if C.AuthREnable {

@@ -1,14 +1,13 @@
 package middlewares
 
 import (
-	"io/ioutil"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/bbcyyb/pcrs/common"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
-	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,8 +16,21 @@ type AuthenticationTestSuite struct {
 	C *gin.Context
 }
 
+type jwtParserMock struct {
+	mock.Mock
+}
+
+func (m *jwtParserMock) Parse(token string) (*pkgJ.Claims, error) {
+	args := m.Called(token)
+
+	return args.Get(0).(*pkgJ.Claims), args.Error(1)
+}
+
+func (m *jwtParserMock) SetJwtSecret(jwtSecret []byte) {
+	m.Called(jwtSecret)
+}
+
 func TestAuthenticationSuite(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
 	suite.Run(t, new(AuthenticationTestSuite))
 }
 
@@ -39,7 +51,8 @@ func (suite *AuthenticationTestSuite) TestAuthentication() {
 
 	suite.C.Request.Header.Set("X-Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTExLCJyaWQiOiI0QjlDOTc0N0QwQzMyOEFEQjA2Nzg4REQ2MUMyRDY1OERBRTJDMEIzMDFDNjI5QUUwMjkzNjkxNjgwNUE3OTU3QjNCREUxN0JDODZENDE3RjFBMTY5MzREM0NDMkVCQjVCODI1QjY0MjM4QzNDOENBM0M3MDY4RDkxQUZEMEJCREVBMDExODdGQTdDMzQ1QzYzNTdBOTcwM0JFMkVGNTg3RTVFMTI4MUI2RkE3MzYzNENFNDZBQjM3ODMwQkRFQzEiLCJ1biI6IkRldiIsImVtIjoiZGV2QGRlbGwuY29tIiwidXIiOjIsImRlIjowLCJleHAiOjE2MDExOTU0MDAsImlzcyI6InBvd2VyY2FsY3VsYXRvciJ9.sQPjfOM1UCZehjEcN45SRQtcMSbi-DY1zWFivkADXL8")
 
-	Authentication()(suite.C)
+	jwt := new(jwtParserMock)
+	Authentication(jwt)(suite.C)
 
 	value := suite.C.MustGet("claims")
 	if ass.NotNil(value) {
@@ -61,7 +74,7 @@ func (suite *AuthenticationTestSuite) TestAuthenticationToMatchLegacyTokenFormat
 
 	suite.C.Request.Header.Set("X-Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTA0ODYsInJpZCI6IjExMTE2MzUiLCJ1biI6IktldmluIFlhYmluZyIsImVtIjoiS2V2aW4uWS5ZdUBlbWMuY29tIiwidXIiOjIsImV4cCI6MTU2NDEwNzc5NzI3OSwiZGUiOjB9.15eK9C0KqQWIA7JbLZVqYgz3gtdkgIykF1tLqnpg57A")
 
-	Authentication()(suite.C)
+	Authentication(nil)(suite.C)
 
 	value := suite.C.MustGet("claims")
 	if ass.NotNil(value) {
@@ -83,7 +96,7 @@ func (suite *AuthenticationTestSuite) TestAuthenticationFail() {
 
 	suite.C.Request.Header.Set("X-Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTExLCJyaWQiOiI0QjlDOTc0N0QwQzMyOEFEQjA2Nzg4REQ2MUMyRDY1OERBRTJDMEIzMDFDNjI5QUUwMjkzNjkxNjgwNUE3OTU3QjNCREUxN0JDODZENDE3RjFBMTY5MzREM0NDMkVCQjVCODI1QjY0MjM4QzNDOENBM0M3MDY4RDkxQUZEMEJCREVBMDExODdGQTdDMzQ1QzYzNTdBOTcwM0JFMkVGNTg3RTVFMTI4MUI2RkE3MzYzNENFNDZBQjM3ODMwQkRFQzEiLCJ1biI6IkRldiIsImVtIjoiZGV2QGRlbGwuY29tIiwidXIiOjIsImRlIjowLCJleHAiOjE2MDExOTU0MDAsImlzcyI6InBvd2VyY2FsY3VsYXRvciJ9.sQPjfOM1UCZehjEcN45SRQtcMSbi-DY1zWFivkADXLa")
 
-	Authentication()(suite.C)
+	Authentication(nil)(suite.C)
 
 	ass.Contains(suite.C.Errors.String(), common.GetCodeMessage(common.ERROR_AUTHT_CHECK_TOKEN_FAIL))
 
@@ -95,7 +108,7 @@ func (suite *AuthenticationTestSuite) TestAuthenticationFail() {
 func (suite *AuthenticationTestSuite) TestAuthenticationMiss() {
 	ass := suite.Assert()
 
-	Authentication()(suite.C)
+	Authentication(nil)(suite.C)
 
 	ass.Contains(suite.C.Errors.String(), common.GetCodeMessage(common.ERROR_AUTHT_CHECK_TOKEN_MISS))
 

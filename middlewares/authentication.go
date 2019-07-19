@@ -11,10 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Authentication() gin.HandlerFunc {
-	log.Debug("Register middleware JWTAuth")
+func Authentication(parser pkgJ.IJWTParser) gin.HandlerFunc {
+	log.Debug("Register middleware Authentication")
 	return func(c *gin.Context) {
-		if err := verify(c); err != nil {
+		if err := verify(c, parser); err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
 		}
 
@@ -22,10 +22,9 @@ func Authentication() gin.HandlerFunc {
 	}
 }
 
-func verify(c *gin.Context) (err error) {
+func verify(c *gin.Context, jwt pkgJ.IJWTParser) (err error) {
 	log.Info("Start to JWT Authenticate.")
 	var code common.Code
-	jwt := pkgJ.NewJWT()
 	jwt.SetJwtSecret([]byte("DELLEMC"))
 
 	code = common.SUCCESS

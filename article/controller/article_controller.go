@@ -6,7 +6,13 @@ import (
 )
 
 type ArticleController struct {
-	AService article.Service
+	AService article.IService
+}
+
+func NewArticleController(service article.IService) *ArticleController {
+	return &ArticleController{
+		AService: service,
+	}
 }
 
 func (a *ArticleController) Get(c *gin.Context) error {

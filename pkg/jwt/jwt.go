@@ -14,6 +14,11 @@ type JWT struct {
 	jwtSecret []byte
 }
 
+type IJWTParser interface {
+	Parse(string) (*Claims, error)
+	SetJwtSecret([]byte)
+}
+
 type Claims struct {
 	Id       int             `json:"id"`
 	RsaId    string          `json:"rid"`

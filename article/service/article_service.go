@@ -7,13 +7,13 @@ import (
 	"github.com/bbcyyb/pcrs/models"
 )
 
-type articleService struct {
+type ArticleService struct {
 	articleRepo article.Repository
 }
 
 // NewArticleService will create new an articleService object representation of article.Service interface
-func NewArticleService(a article.Repository) article.Service {
-	return &articleService{
+func NewArticleService(a *article.Repository) *article.ArticleService {
+	return &ArticleService{
 		articleRepo: a,
 	}
 }
