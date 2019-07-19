@@ -1,88 +1,247 @@
 package logger
 
 import (
-	"bufio"
-	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"io"
+	"io/ioutil"
 	"os"
+	"strings"
+	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
-type logConfig struct {
-	Environment  string
-	Formatter    string
-	Level        string
-	ExportCaller bool
-	LogFilePath  string
+// OutputKey is the viper variable used to define the output
+// FilenameKey is the viper variable used to define log filename
+// LevelKey is the viper variable used to define log level key
+// Formatter is the viper variable used to define log formatter, eg: text, json
+// PrefixField is the viper variable used to define log prefix field
+const (
+	OutputKey   = "log.output"
+	FilenameKey = "log.filename"
+	LevelKey    = "log.level"
+	Formatter   = "log.formatter"
+	PrefixField = "prefix"
+)
+
+// Defaults values to be used when creating a Logger without user parameters
+const (
+	defLevel     = logrus.InfoLevel
+	defPrefix    = ""
+	defFormatter = "text"
+)
+
+var Log *Logger
+
+type Logger struct {
+	logrus.Logger
+
+	mu     sync.Mutex
+	prefix string
 }
-
-var Logger *log.Logger
-
-var config *logConfig
 
 func init() {
-	Logger = log.New()
-	initConfig()
+	Log = newDefault()
 }
 
-func initConfig() {
-	config = &logConfig{
-		Environment:  viper.GetString("environment"),
-		Formatter:    viper.GetString("formatter"),
-		Level:        viper.GetString("level"),
-		ExportCaller: viper.GetBool("exportCaller"),
-		LogFilePath:  viper.GetString("logFilePath"),
-	}
-	log.Debug(config)
-	log.Debugf("Environment : %s", config.Environment)
-	switch config.Environment {
-	case "DEVELOPMENT":
-		initLogToStdoutDebug()
-	case "TEST":
-		initInfoLogToFile()
-	case "STAGING":
-		initWarnLogToFile()
-	case "PRODUCTION":
-		initWarnLogToFile()
-	default:
-		initLogToStdoutDebug()
-	}
+func Setup() {
+	Log = new()
 }
 
-func initLogToStdoutDebug() {
-	Logger.SetLevel(log.DebugLevel)
-	Logger.SetFormatter(&log.TextFormatter{
-		ForceColors:     true,
+func newDefault() *Logger {
+	logger := &Logger{
+		prefix: "",
+	}
+	logger.Formatter = &logrus.TextFormatter{
 		FullTimestamp:   true,
-		TimestampFormat: time.RFC3339Nano})
-	Logger.SetOutput(os.Stdout)
-	Logger.SetReportCaller(true)
+		TimestampFormat: time.RFC3339Nano,
+	}
+	logger.Out = os.Stdout
+	logger.Level = defLevel
+	return logger
 }
 
-func initInfoLogToFile() {
-	Logger.SetLevel(log.InfoLevel)
-	Logger.SetFormatter(&log.JSONFormatter{})
-	f, err := os.OpenFile(config.LogFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		fmt.Errorf("error opening file: %v", err)
+func new() *Logger {
+	prefix := defPrefix
+	if viper.IsSet(PrefixField) {
+		prefix = viper.GetString(PrefixField)
 	}
-	defer f.Close()
-	Logger.SetOutput(f)
-}
+	logger := &Logger{
+		prefix: prefix,
+	}
 
-func initWarnLogToFile() {
-	Logger.SetLevel(log.InfoLevel)
-	Logger.SetFormatter(&log.JSONFormatter{})
-	f, err := os.OpenFile(config.LogFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		fmt.Errorf("error opening file: %v", err)
+	formatter := defFormatter
+	if viper.IsSet(Formatter) {
+		formatter = strings.ToLower(viper.GetString(Formatter))
 	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			panic(err)
+
+	switch formatter {
+	case "json":
+		logger.Formatter = &logrus.JSONFormatter{}
+	case "text":
+		logger.Formatter = &logrus.TextFormatter{
+			FullTimestamp:   true,
+			TimestampFormat: time.RFC3339Nano,
 		}
-	}()
-	writer := bufio.NewWriter(f)
-	Logger.SetOutput(writer)
+	default:
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
+
+	if viper.IsSet(OutputKey) {
+		logger.Out = viper.Get(OutputKey).(io.Writer)
+	} else if viper.IsSet(FilenameKey) {
+		fileName := viper.GetString(FilenameKey)
+		out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+		if err == nil {
+			logger.Out = out
+		} else {
+			logger.Errorf("Cannot create log file %s. %s", fileName, err)
+		}
+	} else {
+		logger.Out = os.Stdout
+	}
+
+	if viper.IsSet(LevelKey) {
+		logLevel, err := logrus.ParseLevel(viper.GetString(LevelKey))
+		if err == nil {
+			logger.Level = logLevel
+		}
+	} else {
+		logger.Level = defLevel
+	}
+
+	return logger
+}
+
+func (logger *Logger) NewEntryWithPrefix(prefix string) *logrus.Entry {
+	return logger.WithField(PrefixField, prefix)
+}
+
+func (logger *Logger) Prefix(prefix string) *logrus.Entry {
+	return logger.NewEntryWithPrefix(prefix)
+}
+
+func (logger *Logger) GetPrefix() string {
+	logger.mu.Lock()
+	defer logger.mu.Unlock()
+	return logger.prefix
+}
+
+func (logger *Logger) SetPrefix(prefix string) {
+	logger.mu.Lock()
+	defer logger.mu.Unlock()
+	logger.prefix = prefix
+}
+
+func (logger *Logger) GetOut() io.Writer {
+	logger.mu.Lock()
+	defer logger.mu.Unlock()
+	return logger.Out
+}
+
+func (logger *Logger) SetOut(out io.Writer) {
+	logger.mu.Lock()
+	defer logger.mu.Unlock()
+	logger.Out = out
+}
+
+func (logger *Logger) DiscardLog() {
+	logger.SetOut(ioutil.Discard)
+}
+
+func (logger *Logger) Debugf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Debugf(format, args...)
+}
+
+func (logger *Logger) Infof(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Infof(format, args...)
+}
+
+func (logger *Logger) Printf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Printf(format, args...)
+}
+
+func (logger *Logger) Warnf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warnf(format, args...)
+}
+
+func (logger *Logger) Warningf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warnf(format, args...)
+}
+
+func (logger *Logger) Errorf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Errorf(format, args...)
+}
+
+func (logger *Logger) Fatalf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Fatalf(format, args...)
+}
+
+func (logger *Logger) Panicf(format string, args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Panicf(format, args...)
+}
+
+func (logger *Logger) Debug(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Debug(args...)
+}
+
+func (logger *Logger) Print(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Info(args...)
+}
+
+func (logger *Logger) Warning(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warn(args...)
+}
+
+func (logger *Logger) Fatal(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Fatal(args...)
+}
+
+func (logger *Logger) Panic(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Panic(args...)
+}
+
+func (logger *Logger) Debugln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Debugln(args...)
+}
+
+func (logger *Logger) Infoln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Infoln(args...)
+}
+
+func (logger *Logger) Println(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Println(args...)
+}
+
+func (logger *Logger) Warnln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warnln(args...)
+}
+
+func (logger *Logger) Warningln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warnln(args...)
+}
+
+func (logger *Logger) Errorln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Errorln(args...)
+}
+
+func (logger *Logger) Fatalln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Fatalln(args...)
+}
+
+func (logger *Logger) Panicln(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Panicln(args...)
+}
+
+func (logger *Logger) Error(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Error(args...)
+}
+
+func (logger *Logger) Info(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Info(args...)
+}
+
+func (logger *Logger) Warn(args ...interface{}) {
+	logger.WithField(PrefixField, logger.prefix).Warn(args...)
 }
