@@ -19,7 +19,7 @@ func removeTimestamp(logMessage string) string {
 
 func newLogger(b *bytes.Buffer, v *viper.Viper) *Logger {
 	v.Set(OutputKey, b)
-	l := New(v)
+	l := NewLogger(v)
 	return l
 }
 
@@ -62,7 +62,7 @@ func TestNew(t *testing.T) {
 func TestSetPrefix(t *testing.T) {
 	v := viper.New()
 	v.Set(LevelKey, "Info")
-	l := New(v)
+	l := NewLogger(v)
 	l.SetPrefix("test")
 	actualPrefix := l.GetPrefix()
 	expectedPrefix := "test"
@@ -74,7 +74,7 @@ func TestSetPrefix(t *testing.T) {
 func TestSetOut(t *testing.T) {
 	v := viper.New()
 	v.Set(LevelKey, "Info")
-	l := New(v)
+	l := NewLogger(v)
 	l.SetOut(os.Stdout)
 	actualPrefix := l.GetOut()
 	expectedPrefix := os.Stdout

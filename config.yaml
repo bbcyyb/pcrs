@@ -1,6 +1,10 @@
 database:
-    url: 123
-    port: 9090
+    server: 10.35.83.61:1433
+    user: PowerCalc
+    password: Power@1433
+    database: PowerCalcFor46
+    source: file://scripts
+
 middlewares:
     authentication:
         enable: true
@@ -10,3 +14,9 @@ middlewares:
         model: authmodel.conf
     log:
         enable: false
+log:
+    level: debug
+    output: os.Stdout
+    filename: ""
+    formatter: text
+    prefix: test

@@ -74,9 +74,9 @@ func Setup() {
 	initLog()
 	initConfig()
 
+	logger.SetupLogger()
 	middlewares.Setup()
 	pkg.Setup()
-	logger.Setup()
 
 	//	Execute()
 }
