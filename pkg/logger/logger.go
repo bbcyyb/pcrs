@@ -42,14 +42,14 @@ type Logger struct {
 }
 
 func init() {
-	Log = newDefault()
+	Log = NewDefault()
 }
 
 func Setup() {
-	Log = new()
+	Log = New(viper.GetViper())
 }
 
-func newDefault() *Logger {
+func NewDefault() *Logger {
 	logger := &Logger{
 		prefix: "",
 	}
@@ -62,7 +62,7 @@ func newDefault() *Logger {
 	return logger
 }
 
-func new() *Logger {
+func New(viper *viper.Viper) *Logger {
 	prefix := defPrefix
 	if viper.IsSet(PrefixField) {
 		prefix = viper.GetString(PrefixField)
