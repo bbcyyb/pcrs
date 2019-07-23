@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/bbcyyb/pcrs/common"
-	pkgA "github.com/bbcyyb/pcrs/pkg/authorizer"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
@@ -16,7 +15,7 @@ import (
 type AuthorizationTestSuite struct {
 	suite.Suite
 	C           *gin.Context
-	AuthorizerM pkgA.IAuthorizer
+	AuthorizerM *authorizerMock
 }
 
 type authorizerMock struct {
@@ -69,6 +68,7 @@ func (suite *AuthorizationTestSuite) TestAuthorization() {
 
 	Authorization(suite.AuthorizerM)(suite.C)
 
+	suite.AuthorizerM.AssertNumberOfCalls(suite.T(), "CheckPermission", 1)
 	ass.Nil(suite.C.Errors)
 }
 

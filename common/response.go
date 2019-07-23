@@ -54,7 +54,6 @@ func InternalServerError(c *gin.Context, err error) {
 }
 
 func Respond(c *gin.Context, status int, data interface{}, err error) {
-
 	resp := Response{
 		Code:    status,
 		Message: "",
