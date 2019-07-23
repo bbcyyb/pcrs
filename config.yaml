@@ -16,7 +16,5 @@ middlewares:
         enable: false
 log:
     level: debug
-    output: os.Stdout
-    filename: ""
     formatter: text
-    prefix: test
+    prefix: pcrs

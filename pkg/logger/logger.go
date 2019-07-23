@@ -12,17 +12,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-// OutputKey is the viper variable used to define the output
 // FilenameKey is the viper variable used to define log filename
 // LevelKey is the viper variable used to define log level key
 // Formatter is the viper variable used to define log formatter, eg: text, json
 // PrefixField is the viper variable used to define log prefix field
 const (
-	OutputKey   = "log.output"
 	FilenameKey = "log.filename"
 	LevelKey    = "log.level"
 	Formatter   = "log.formatter"
-	PrefixField = "prefix"
+	PrefixField = "log.prefix"
 )
 
 // Defaults values to be used when creating a Logger without user parameters
@@ -88,9 +86,7 @@ func NewLogger(viper *viper.Viper) *Logger {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
-	if viper.IsSet(OutputKey) {
-		logger.Out = viper.Get(OutputKey).(io.Writer)
-	} else if viper.IsSet(FilenameKey) {
+	if viper.IsSet(FilenameKey) {
 		fileName := viper.GetString(FilenameKey)
 		out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 		if err == nil {

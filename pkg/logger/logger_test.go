@@ -17,12 +17,6 @@ func removeTimestamp(logMessage string) string {
 	return strings.Join(noTimeStamp, " ")
 }
 
-func newLogger(b *bytes.Buffer, v *viper.Viper) *Logger {
-	v.Set(OutputKey, b)
-	l := NewLogger(v)
-	return l
-}
-
 func TestNew(t *testing.T) {
 	var expectedLogMessage string
 	var actualLogMessage string
@@ -31,7 +25,8 @@ func TestNew(t *testing.T) {
 	v := viper.New()
 
 	v.Set(LevelKey, "debug")
-	l := newLogger(&b, v)
+	l := NewLogger(v)
+	l.Out = &b
 
 	l.Prefix("test").WithFields(logrus.Fields{"key": "value", "env": "test testing"}).Info("Information")
 	expectedLogMessage = `level=info msg=Information env="test testing" key=value prefix=test`

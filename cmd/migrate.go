@@ -147,7 +147,7 @@ func postRun() {
 
 func init() {
 	migrateCmd.Flags().BoolVarP(&help, "help", "h", false, "Print usage")
-	migrateCmd.Flags().BoolVarP(&version, "version", "v", false, "Print version")
+	migrateCmd.Flags().BoolVarP(&version, "version", "m", false, "Print version")
 	migrateCmd.PersistentFlags().UintVarP(&prefetch, "prefetch", "f", 10, "Number of migrations to load in advance before executing (default 10)")
 	migrateCmd.PersistentFlags().UintVarP(&lockTimeout, "lockTimeout", "l", 15, "Allow N seconds to acquire database lock (default 15)")
 	migrateCmd.PersistentFlags().StringVarP(&path, "path", "p", "", "Shorthand for -source file://path")
