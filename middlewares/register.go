@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	pkgA "github.com/bbcyyb/pcrs/pkg/authorizer"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,8 @@ func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	}
 
 	if C.AuthREnable {
-		authGroup.Use(Authorization())
+		authorizer := pkgA.NewBasicAuthorizer()
+		authGroup.Use(Authorization(authorizer))
 	}
 
 	if C.LogEnable {

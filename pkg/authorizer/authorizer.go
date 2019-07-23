@@ -11,6 +11,10 @@ type BasicAuthorizer struct {
 	enforcer *casbin.Enforcer
 }
 
+type IAuthorizer interface {
+	CheckPermission(string, *http.Request) bool
+}
+
 func NewBasicAuthorizer() *BasicAuthorizer {
 	e := casbin.NewEnforcer(pkg.C.AuthModelFile, pkg.C.AuthPolicyFile)
 	return &BasicAuthorizer{enforcer: e}

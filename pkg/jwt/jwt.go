@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	defaultJwtSecret []byte = []byte("DEFAULT")
+	defaultJwtSecret []byte = []byte("DELLEMC")
 )
 
 type JWT struct {
