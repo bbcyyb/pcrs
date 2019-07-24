@@ -49,7 +49,7 @@ type Authorizer struct {
 type Log struct {
 	Level     string `mapstructure: "level"`
 	Formatter string `mapstructure: "formatter"`
-	Prefix    string `mapstructure: "prefix"`
+	LineNum   bool   `mapstructure: "linenum"`
 	FileName  string `mapstructure: "filename"`
 }
 

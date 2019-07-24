@@ -18,5 +18,5 @@ pkg:
     log:
         level: debug
         formatter: text
-        prefix: pcrs
+        linenum: true
         filename: pcrs.log

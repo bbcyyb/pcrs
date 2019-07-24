@@ -44,7 +44,7 @@ func (suite *ConfTestSuite) SetupSuite() {
 			Log: Log{
 				Level:     "debug",
 				Formatter: "text",
-				Prefix:    "pcrs",
+				LineNum:   true,
 				FileName:  "pcrs.log",
 			},
 		},
