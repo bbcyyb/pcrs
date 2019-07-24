@@ -156,15 +156,6 @@ func (logger *Logger) Infof(format string, args ...interface{}) {
 	}
 }
 
-func (logger *Logger) Printf(format string, args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Printf(format, args...)
-	} else {
-		logger.log.Printf(format, args...)
-	}
-}
-
 func (logger *Logger) Warnf(format string, args ...interface{}) {
 	if logger.lineNum {
 		line, info := logger.getCallerLineNum()
@@ -192,24 +183,6 @@ func (logger *Logger) Errorf(format string, args ...interface{}) {
 	}
 }
 
-func (logger *Logger) Fatalf(format string, args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Fatalf(format, args...)
-	} else {
-		logger.log.Fatalf(format, args...)
-	}
-}
-
-func (logger *Logger) Panicf(format string, args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Panicf(format, args...)
-	} else {
-		logger.log.Panicf(format, args...)
-	}
-}
-
 func (logger *Logger) Debug(args ...interface{}) {
 	if logger.lineNum {
 		line, info := logger.getCallerLineNum()
@@ -219,111 +192,12 @@ func (logger *Logger) Debug(args ...interface{}) {
 	}
 }
 
-func (logger *Logger) Print(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Print(args...)
-	} else {
-		logger.log.Print(args...)
-	}
-}
-
 func (logger *Logger) Warning(args ...interface{}) {
 	if logger.lineNum {
 		line, info := logger.getCallerLineNum()
 		logger.log.WithField(line, info).Warning(args...)
 	} else {
 		logger.log.Warning(args...)
-	}
-}
-
-func (logger *Logger) Fatal(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Fatal(args...)
-	} else {
-		logger.log.Fatal(args...)
-	}
-}
-
-func (logger *Logger) Panic(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Panic(args...)
-	} else {
-		logger.log.Panic(args...)
-	}
-}
-
-func (logger *Logger) Debugln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Debugln(args...)
-	} else {
-		logger.log.Debugln(args...)
-	}
-}
-
-func (logger *Logger) Infoln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Infoln(args...)
-	} else {
-		logger.log.Infoln(args...)
-	}
-}
-
-func (logger *Logger) Println(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Println(args...)
-	} else {
-		logger.log.Println(args...)
-	}
-}
-
-func (logger *Logger) Warnln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Warnln(args...)
-	} else {
-		logger.log.Warnln(args...)
-	}
-}
-
-func (logger *Logger) Warningln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Warningln(args...)
-	} else {
-		logger.log.Warningln(args...)
-	}
-}
-
-func (logger *Logger) Errorln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Errorln(args...)
-	} else {
-		logger.log.Errorln(args...)
-	}
-}
-
-func (logger *Logger) Fatalln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Fatalln(args...)
-	} else {
-		logger.log.Fatalln(args...)
-	}
-}
-
-func (logger *Logger) Panicln(args ...interface{}) {
-	if logger.lineNum {
-		line, info := logger.getCallerLineNum()
-		logger.log.WithField(line, info).Panicln(args...)
-	} else {
-		logger.log.Panicln(args...)
 	}
 }
 
