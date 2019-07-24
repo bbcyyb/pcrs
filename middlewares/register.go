@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/bbcyyb/pcrs/conf"
 	pkgA "github.com/bbcyyb/pcrs/pkg/authorizer"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/bbcyyb/pcrs/pkg/log"
@@ -13,18 +14,18 @@ func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	authGroup.Use(ErrorHandler())
 	group.Use(ErrorHandler())
 
-	if C.AuthTEnable {
+	if conf.C.Middleware.Authentication.Enable {
 		jwt := pkgJ.NewJWT()
 		authGroup.Use(Authentication(jwt))
 	}
 
-	if C.AuthREnable {
+	if conf.C.Middleware.Authorization.Enable {
 		authorizer := pkgA.NewBasicAuthorizer()
 		authGroup.Use(Authorization(authorizer))
 	}
 
-	if C.LogEnable {
-		authGroup.Use(Log())
-		group.Use(Log())
+	if conf.C.Middleware.ErrorHandler.Enable {
+		authGroup.Use(ErrorHandler())
+		group.Use(ErrorHandler())
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/bbcyyb/pcrs/pkg/log"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 var serveCmd = &cobra.Command{
@@ -27,7 +26,7 @@ var serveCmd = &cobra.Command{
 
 		controllers.Register(group, authGroup)
 
-		address := "0.0.0.0:" + strconv.Itoa(C.Port)
+		address := "0.0.0.0:8080"
 		log.Info("Start WebApplication through gin-gonic/gin ", address)
 
 		r.Run(address)

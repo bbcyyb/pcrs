@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"github.com/bbcyyb/pcrs/pkg/logger"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/sys/unix"
 
