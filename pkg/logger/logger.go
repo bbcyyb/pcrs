@@ -4,30 +4,17 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/bbcyyb/pcrs/conf"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-)
-
-// FilenameKey is the viper variable used to define log filename
-// LevelKey is the viper variable used to define log level key
-// Formatter is the viper variable used to define log formatter, eg: text, json
-// PrefixField is the viper variable used to define log prefix field
-const (
-	FilenameKey = "log.filename"
-	LevelKey    = "log.level"
-	Formatter   = "log.formatter"
-	PrefixField = "log.prefix"
 )
 
 // Defaults values to be used when creating a Logger without user parameters
 const (
-	defLevel     = logrus.InfoLevel
-	defPrefix    = ""
-	defFormatter = "text"
+	defLevel    = logrus.InfoLevel
+	PrefixField = "prefix"
 )
 
 var Log *Logger
@@ -43,8 +30,8 @@ func init() {
 	Log = newDefault()
 }
 
-func SetupLogger() {
-	Log = NewLogger(viper.GetViper())
+func Setup() {
+	Log = NewLogger()
 }
 
 func newDefault() *Logger {
@@ -60,20 +47,13 @@ func newDefault() *Logger {
 	return logger
 }
 
-func NewLogger(viper *viper.Viper) *Logger {
-	prefix := defPrefix
-	if viper.IsSet(PrefixField) {
-		prefix = viper.GetString(PrefixField)
-	}
+func NewLogger() *Logger {
+	prefix := conf.C.Pkg.Log.Prefix
 	logger := &Logger{
 		prefix: prefix,
 	}
 
-	formatter := defFormatter
-	if viper.IsSet(Formatter) {
-		formatter = strings.ToLower(viper.GetString(Formatter))
-	}
-
+	formatter := conf.C.Pkg.Log.Formatter
 	switch formatter {
 	case "json":
 		logger.Formatter = &logrus.JSONFormatter{}
@@ -86,8 +66,7 @@ func NewLogger(viper *viper.Viper) *Logger {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
-	if viper.IsSet(FilenameKey) {
-		fileName := viper.GetString(FilenameKey)
+	if fileName := conf.C.Pkg.Log.FileName; len(fileName) > 0 {
 		out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 		if err == nil {
 			logger.Out = out
@@ -98,10 +77,12 @@ func NewLogger(viper *viper.Viper) *Logger {
 		logger.Out = os.Stdout
 	}
 
-	if viper.IsSet(LevelKey) {
-		logLevel, err := logrus.ParseLevel(viper.GetString(LevelKey))
+	if logLevel := conf.C.Pkg.Log.Level; len(logLevel) > 0 {
+		level, err := logrus.ParseLevel(logLevel)
 		if err == nil {
-			logger.Level = logLevel
+			logger.Level = level
+		} else {
+			logger.Level = defLevel
 		}
 	} else {
 		logger.Level = defLevel

@@ -4,14 +4,13 @@ db:
     password: Power@1433
     database: PowerCalcFor46
     source: file://scripts
-
-middlewares:
+middleware:
     authentication:
         enable: true
     authorization:
-        enable: false
-    log:
-        enable: false
+        enable: true
+    errorHandler:
+        enable: true
 pkg:
     authorizer:
         policy: authpolicy.csv
@@ -20,4 +19,4 @@ pkg:
         level: debug
         formatter: text
         prefix: pcrs
-        fileName: pcrs.log
+        filename: pcrs.log

@@ -7,51 +7,17 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/sys/unix"
 
+	"github.com/bbcyyb/pcrs/conf"
 	"github.com/bbcyyb/pcrs/middlewares"
 	"github.com/bbcyyb/pcrs/pkg"
 	"github.com/bbcyyb/pcrs/pkg/log"
 )
-
-type config struct {
-	Port int
-}
-
-var C *config
 
 var rootCmd = &cobra.Command{
 	Use:   "pcrs",
 	Short: "PowerCalculator Restful Service",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 	},
-}
-
-func initConfig() {
-	if configFile != "" {
-		viper.SetConfigFile(configFile)
-	} else {
-		viper.SetConfigName("config")
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("/etc/todos")
-		viper.AddConfigPath("$HOME/.pcrs")
-
-		viper.AutomaticEnv()
-
-		if err := viper.ReadInConfig(); err != nil {
-			log.Error(err)
-		}
-	}
-
-	log.Info("Initialize config info for cmd package")
-
-	port := viper.GetInt("database.port")
-	log.Debug("Config Node port is ", port)
-	C = &config{
-		Port: port,
-	}
-
-	if C.Port == 0 {
-		C.Port = 8080
-	}
 }
 
 func initLog() {
@@ -72,13 +38,10 @@ func initLog() {
 
 func Setup() {
 	initLog()
-	initConfig()
 
-	logger.SetupLogger()
-	middlewares.Setup()
+	conf.Setup(configFile)
 	pkg.Setup()
-
-	//	Execute()
+	middlewares.Setup()
 }
 
 func Execute() (err error) {

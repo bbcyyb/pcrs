@@ -18,7 +18,7 @@ func Authorization(auth pkgA.IAuthorizer) gin.HandlerFunc {
 		role := getRole(c)
 		roleName := common.GetRoleEnumMessage(role)
 		if !auth.CheckPermission(roleName, c.Request) {
-			err := errors.New(common.GetCodeMessage(common.ERROR_AUTHR_CHECK_PERMISSION_FAIL))
+			err := errors.New(common.GetCodeMessage(common.ERROR_AUTHZ_CHECK_PERMISSION_FAIL))
 			c.AbortWithError(http.StatusForbidden, err)
 		}
 

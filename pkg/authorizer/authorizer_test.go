@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/bbcyyb/pcrs/common"
 	"github.com/bbcyyb/pcrs/pkg"
 	"github.com/stretchr/testify/suite"
 )
@@ -30,8 +31,7 @@ func TestAuthorizerSuite(t *testing.T) {
 func (suite *AuthorizerTestSuite) SetupSuite() {
 	ass := suite.Assert()
 
-	_, filename, _, _ := runtime.Caller(0)
-	dir := path.Dir(filename)
+	dir := common.BuildRunningPath("")
 	pkg.C = &pkg.Config{
 		AuthPolicyFile: path.Join(dir, "auth_policy_test.csv"),
 		AuthModelFile:  path.Join(dir, "auth_model_test.conf"),
