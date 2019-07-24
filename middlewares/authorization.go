@@ -7,12 +7,12 @@ import (
 	"github.com/bbcyyb/pcrs/common"
 	pkgA "github.com/bbcyyb/pcrs/pkg/authorizer"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/bbcyyb/pcrs/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func Authorization(auth pkgA.IAuthorizer) gin.HandlerFunc {
-	log.Debug("Register middleware Authorization")
+	logger.Log.Debug("Register middleware Authorization")
 
 	return func(c *gin.Context) {
 		role := getRole(c)
@@ -30,10 +30,10 @@ func getRole(c *gin.Context) common.RoleEnum {
 	if value, ok := c.Get("claims"); ok {
 		claims := value.(*(pkgJ.Claims))
 		role := claims.Role
-		log.Debug("session role ----> ", common.GetRoleEnumMessage(role))
+		logger.Log.Debug("session role ----> ", common.GetRoleEnumMessage(role))
 		return role
 	}
 
-	log.Debug("default role ---> User")
+	logger.Log.Debug("default role ---> User")
 	return common.USERROLE_USER
 }

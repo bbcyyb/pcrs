@@ -7,12 +7,12 @@ import (
 
 	"github.com/bbcyyb/pcrs/common"
 	pkgJ "github.com/bbcyyb/pcrs/pkg/jwt"
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/bbcyyb/pcrs/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func Authentication(parser pkgJ.IJWTParser) gin.HandlerFunc {
-	log.Debug("Register middleware Authentication")
+	logger.Log.Debug("Register middleware Authentication")
 	return func(c *gin.Context) {
 		if err := verify(c, parser); err != nil {
 			c.AbortWithError(http.StatusUnauthorized, err)
@@ -23,7 +23,7 @@ func Authentication(parser pkgJ.IJWTParser) gin.HandlerFunc {
 }
 
 func verify(c *gin.Context, jwt pkgJ.IJWTParser) (err error) {
-	log.Info("Start to JWT Authenticate.")
+	logger.Log.Info("Start to JWT Authenticate.")
 	var code common.Code
 	jwt.SetJwtSecret([]byte("DELLEMC"))
 
@@ -45,7 +45,7 @@ func verify(c *gin.Context, jwt pkgJ.IJWTParser) (err error) {
 		msg := common.GetCodeMessage(code)
 
 		err = errors.New(msg)
-		log.Error("JWT verification failed, error message: ", err)
+		logger.Log.Error("JWT verification failed, error message: ", err)
 	}
 
 	return

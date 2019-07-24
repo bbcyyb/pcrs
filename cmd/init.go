@@ -1,14 +1,10 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
-	"golang.org/x/sys/unix"
-
 	"github.com/bbcyyb/pcrs/conf"
 	"github.com/bbcyyb/pcrs/middlewares"
 	"github.com/bbcyyb/pcrs/pkg"
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
@@ -18,25 +14,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func initLog() {
-	if !terminal.IsTerminal(unix.Stdout) {
-		log.SetFormatter(log.JSON)
-	} else {
-		log.SetFormatter(log.TEXT)
-	}
-
-	if verbose, _ := rootCmd.Flags().GetBool("verbose"); verbose {
-		log.SetLevel(log.DebugLevel)
-	} else {
-		log.SetLevel(log.InfoLevel)
-	}
-
-	log.Info("Log settings is ready")
-}
-
 func Setup() {
-	initLog()
-
 	conf.Setup(configFile)
 	pkg.Setup()
 	middlewares.Setup()
@@ -51,6 +29,5 @@ var configFile string
 
 func init() {
 	cobra.OnInitialize(Setup)
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "make output more verbose")
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", "", "config file (default is config.yaml)")
 }

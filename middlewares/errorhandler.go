@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/bbcyyb/pcrs/common"
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/bbcyyb/pcrs/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func ErrorHandler() gin.HandlerFunc {
-	log.Debug("Register middleware ResponseHandler")
+	logger.Log.Debug("Register middleware ResponseHandler")
 	return func(c *gin.Context) {
 		c.Next()
 

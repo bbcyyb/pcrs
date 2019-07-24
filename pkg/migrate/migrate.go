@@ -3,7 +3,7 @@ package migrate
 import (
 	"errors"
 	"fmt"
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/bbcyyb/pcrs/pkg/logger"
 	migrateV4 "github.com/golang-migrate/migrate/v4"
 	"strconv"
 	"strings"
@@ -14,7 +14,7 @@ func ExecuteUp(migrater *migrateV4.Migrate, arg string) {
 	if arg != "" {
 		n, err := strconv.ParseUint(arg, 10, 64)
 		if err != nil {
-			log.Error("error: can't read limit argument N")
+			logger.Log.Error("error: can't read limit argument N")
 			return
 		}
 		limit = int(n)
@@ -25,19 +25,19 @@ func ExecuteUp(migrater *migrateV4.Migrate, arg string) {
 func ExecuteDown(migrater *migrateV4.Migrate, downArg string) {
 	num, needsConfirm, err := numDownMigrationsFromArgs(downArg)
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		return
 	}
 	if needsConfirm {
-		log.Info("Are you sure you want to apply all down migrations? [y/N]")
+		logger.Log.Info("Are you sure you want to apply all down migrations? [y/N]")
 		var response string
 		fmt.Scanln(&response)
 		response = strings.ToLower(strings.TrimSpace(response))
 
 		if response == "y" {
-			log.Info("Applying all down migrations")
+			logger.Log.Info("Applying all down migrations")
 		} else {
-			log.Error("Not applying all down migrations")
+			logger.Log.Error("Not applying all down migrations")
 		}
 	}
 	downVersion(migrater, num)
@@ -46,7 +46,7 @@ func ExecuteDown(migrater *migrateV4.Migrate, downArg string) {
 func ExecuteGoto(migrater *migrateV4.Migrate, arg string) {
 	v, err := strconv.ParseUint(arg, 10, 64)
 	if err != nil {
-		log.Error("error: can't read version argument V")
+		logger.Log.Error("error: can't read version argument V")
 		return
 	}
 
@@ -73,12 +73,12 @@ func numDownMigrationsFromArgs(arg string) (int, bool, error) {
 func upVersion(m *migrateV4.Migrate, limit int) {
 	if limit >= 0 {
 		if err := m.Steps(limit); err != nil {
-			log.Error(err)
+			logger.Log.Error(err)
 			return
 		}
 	} else {
 		if err := m.Up(); err != nil {
-			log.Error(err)
+			logger.Log.Error(err)
 			return
 		}
 	}
@@ -88,12 +88,12 @@ func upVersion(m *migrateV4.Migrate, limit int) {
 func downVersion(m *migrateV4.Migrate, limit int) {
 	if limit >= 0 {
 		if err := m.Steps(-limit); err != nil {
-			log.Error(err)
+			logger.Log.Error(err)
 			return
 		}
 	} else {
 		if err := m.Down(); err != nil {
-			log.Error(err)
+			logger.Log.Error(err)
 			return
 		}
 	}
@@ -102,7 +102,7 @@ func downVersion(m *migrateV4.Migrate, limit int) {
 
 func gotoVersion(m *migrateV4.Migrate, v uint) {
 	if err := m.Migrate(v); err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		return
 	}
 	versionLook(m)
@@ -111,12 +111,12 @@ func gotoVersion(m *migrateV4.Migrate, v uint) {
 func versionLook(m *migrateV4.Migrate) {
 	v, dirty, err := m.Version()
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 	}
 	if dirty {
-		log.Errorf("version %v is (dirty)\n", v)
+		logger.Log.Errorf("version %v is (dirty)\n", v)
 	} else {
-		log.Infof("current version is:%v", v)
+		logger.Log.Infof("current version is:%v", v)
 	}
 }
 
@@ -132,5 +132,5 @@ func SampleTest() {
 		return
 	}
 	m.Steps(2)
-	log.Info(connectString)
+	logger.Log.Info(connectString)
 }

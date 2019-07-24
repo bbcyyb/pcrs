@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bbcyyb/pcrs/pkg/log"
+	"github.com/bbcyyb/pcrs/pkg/logger"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
@@ -39,7 +39,7 @@ func Setup() *Connection {
 	db, err := gorm.Open(dbType, connectionString)
 
 	if err != nil {
-		log.Error(err)
+		logger.Log.Error(err)
 		panic("failed to connect database")
 	}
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
@@ -50,7 +50,7 @@ func Setup() *Connection {
 
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
-	log.Info("connect mssql ....")
+	logger.Log.Info("connect mssql ....")
 
 	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
 	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
