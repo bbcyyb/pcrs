@@ -16,6 +16,8 @@
 
 # Runnable file
 main
+*.exe
+*.log
 
 # Skip temp file in vim
 .*.swp
