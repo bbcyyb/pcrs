@@ -1,42 +1,32 @@
 package logger
 
 import (
+	"fmt"
+	"github.com/bbcyyb/pcrs/conf"
 	"io"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-)
-
-// FilenameKey is the viper variable used to define log filename
-// LevelKey is the viper variable used to define log level key
-// Formatter is the viper variable used to define log formatter, eg: text, json
-// PrefixField is the viper variable used to define log prefix field
-const (
-	FilenameKey = "log.filename"
-	LevelKey    = "log.level"
-	Formatter   = "log.formatter"
-	PrefixField = "log.prefix"
 )
 
 // Defaults values to be used when creating a Logger without user parameters
 const (
 	defLevel     = logrus.InfoLevel
-	defPrefix    = ""
-	defFormatter = "text"
+	PrefixField = "prefix"
 )
 
 var Log *Logger
 
 type Logger struct {
-	logrus.Logger
+	log *logrus.Logger
 
-	mu     sync.Mutex
-	prefix string
+	mu           sync.Mutex
+	enableCaller bool
 }
 
 func init() {
@@ -44,200 +34,317 @@ func init() {
 }
 
 func SetupLogger() {
-	Log = NewLogger(viper.GetViper())
+	Log = NewLogger()
 }
 
 func newDefault() *Logger {
 	logger := &Logger{
-		prefix: "",
+		enableCaller: false,
+		log:          logrus.New(),
 	}
-	logger.Formatter = &logrus.TextFormatter{
+	logger.log.Formatter = &logrus.TextFormatter{
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC3339Nano,
 	}
-	logger.Out = os.Stdout
-	logger.Level = defLevel
+	logger.log.Out = os.Stdout
+	logger.log.Level = defLevel
 	return logger
 }
 
-func NewLogger(viper *viper.Viper) *Logger {
-	prefix := defPrefix
-	if viper.IsSet(PrefixField) {
-		prefix = viper.GetString(PrefixField)
-	}
+func NewLogger() *Logger {
 	logger := &Logger{
-		prefix: prefix,
+		enableCaller: conf.LogConf.Caller,
 	}
 
-	formatter := defFormatter
-	if viper.IsSet(Formatter) {
-		formatter = strings.ToLower(viper.GetString(Formatter))
-	}
-
+	formatter := strings.ToLower(conf.LogConf.Formatter)
 	switch formatter {
 	case "json":
-		logger.Formatter = &logrus.JSONFormatter{}
+		logger.log.Formatter = &logrus.JSONFormatter{}
 	case "text":
-		logger.Formatter = &logrus.TextFormatter{
+		logger.log.Formatter = &logrus.TextFormatter{
 			FullTimestamp:   true,
 			TimestampFormat: time.RFC3339Nano,
 		}
 	default:
-		logrus.SetFormatter(&logrus.JSONFormatter{})
+		logger.log.Formatter = &logrus.JSONFormatter{}
 	}
 
-	if viper.IsSet(FilenameKey) {
-		fileName := viper.GetString(FilenameKey)
+	if fileName := conf.LogConf.FileName; len(fileName) > 0 {
 		out, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 		if err == nil {
-			logger.Out = out
+			logger.log.Out = out
 		} else {
+			logger.log.Out = os.Stdout
 			logger.Errorf("Cannot create log file %s. %s", fileName, err)
 		}
 	} else {
-		logger.Out = os.Stdout
+		logger.log.Out = os.Stdout
 	}
 
-	if viper.IsSet(LevelKey) {
-		logLevel, err := logrus.ParseLevel(viper.GetString(LevelKey))
-		if err == nil {
-			logger.Level = logLevel
-		}
+	logLevel, err := logrus.ParseLevel(conf.LogConf.Level)
+	if err == nil {
+		logger.log.Level = logLevel
 	} else {
-		logger.Level = defLevel
+		logger.log.Level = defLevel
 	}
 
 	return logger
 }
 
 func (logger *Logger) NewEntryWithPrefix(prefix string) *logrus.Entry {
-	return logger.WithField(PrefixField, prefix)
+	return logger.log.WithField(PrefixField, prefix)
 }
 
 func (logger *Logger) Prefix(prefix string) *logrus.Entry {
 	return logger.NewEntryWithPrefix(prefix)
 }
 
-func (logger *Logger) GetPrefix() string {
+func (logger *Logger) GetEnableCaller() bool {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
-	return logger.prefix
+	return logger.enableCaller
 }
 
-func (logger *Logger) SetPrefix(prefix string) {
+func (logger *Logger) SetEnableCaller(enableCaller bool) {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
-	logger.prefix = prefix
+	logger.enableCaller = enableCaller
 }
 
 func (logger *Logger) GetOut() io.Writer {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
-	return logger.Out
+	return logger.log.Out
 }
 
 func (logger *Logger) SetOut(out io.Writer) {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
-	logger.Out = out
+	logger.log.Out = out
 }
 
 func (logger *Logger) DiscardLog() {
 	logger.SetOut(ioutil.Discard)
 }
 
+func (logger *Logger) getAdditionalField() (string, string) {
+	_, file, line, _ := runtime.Caller(2)
+	lineInfo := fmt.Sprintf("%s:%v", file, line)
+	return "line", lineInfo
+}
+
 func (logger *Logger) Debugf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Debugf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Debugf(format, args...)
+	} else {
+		logger.log.Debugf(format, args...)
+	}
 }
 
 func (logger *Logger) Infof(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Infof(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Infof(format, args...)
+	} else {
+		logger.log.Infof(format, args...)
+	}
 }
 
 func (logger *Logger) Printf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Printf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Printf(format, args...)
+	} else {
+		logger.log.Printf(format, args...)
+	}
 }
 
 func (logger *Logger) Warnf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warnf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warnf(format, args...)
+	} else {
+		logger.log.Warnf(format, args...)
+	}
 }
 
 func (logger *Logger) Warningf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warnf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warningf(format, args...)
+	} else {
+		logger.log.Warningf(format, args...)
+	}
 }
 
 func (logger *Logger) Errorf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Errorf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Errorf(format, args...)
+	} else {
+		logger.log.Errorf(format, args...)
+	}
 }
 
 func (logger *Logger) Fatalf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Fatalf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Fatalf(format, args...)
+	} else {
+		logger.log.Fatalf(format, args...)
+	}
 }
 
 func (logger *Logger) Panicf(format string, args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Panicf(format, args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Panicf(format, args...)
+	} else {
+		logger.log.Panicf(format, args...)
+	}
 }
 
 func (logger *Logger) Debug(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Debug(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Debug(args...)
+	} else {
+		logger.log.Debug(args...)
+	}
 }
 
 func (logger *Logger) Print(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Info(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Print(args...)
+	} else {
+		logger.log.Print(args...)
+	}
 }
 
 func (logger *Logger) Warning(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warn(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warning(args...)
+	} else {
+		logger.log.Warning(args...)
+	}
 }
 
 func (logger *Logger) Fatal(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Fatal(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Fatal(args...)
+	} else {
+		logger.log.Fatal(args...)
+	}
 }
 
 func (logger *Logger) Panic(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Panic(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Panic(args...)
+	} else {
+		logger.log.Panic(args...)
+	}
 }
 
 func (logger *Logger) Debugln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Debugln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Debugln(args...)
+	} else {
+		logger.log.Debugln(args...)
+	}
 }
 
 func (logger *Logger) Infoln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Infoln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Infoln(args...)
+	} else {
+		logger.log.Infoln(args...)
+	}
 }
 
 func (logger *Logger) Println(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Println(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Println(args...)
+	} else {
+		logger.log.Println(args...)
+	}
 }
 
 func (logger *Logger) Warnln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warnln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warnln(args...)
+	} else {
+		logger.log.Warnln(args...)
+	}
 }
 
 func (logger *Logger) Warningln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warnln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warningln(args...)
+	} else {
+		logger.log.Warningln(args...)
+	}
 }
 
 func (logger *Logger) Errorln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Errorln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Errorln(args...)
+	} else {
+		logger.log.Errorln(args...)
+	}
 }
 
 func (logger *Logger) Fatalln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Fatalln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Fatalln(args...)
+	} else {
+		logger.log.Fatalln(args...)
+	}
 }
 
 func (logger *Logger) Panicln(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Panicln(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Panicln(args...)
+	} else {
+		logger.log.Panicln(args...)
+	}
 }
 
 func (logger *Logger) Error(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Error(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Error(args...)
+	} else {
+		logger.log.Error(args...)
+	}
 }
 
 func (logger *Logger) Info(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Info(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Info(args...)
+	} else {
+		logger.log.Info(args...)
+	}
 }
 
 func (logger *Logger) Warn(args ...interface{}) {
-	logger.WithField(PrefixField, logger.prefix).Warn(args...)
+	if logger.enableCaller {
+		key, value := logger.getAdditionalField()
+		logger.log.WithField(key, value).Warn(args...)
+	} else {
+		logger.log.Warn(args...)
+	}
 }
