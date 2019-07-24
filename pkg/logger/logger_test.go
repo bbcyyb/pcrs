@@ -7,9 +7,20 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bbcyyb/pcrs/conf"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
+
+var config = &conf.Config{
+	Pkg: conf.Pkg{
+		Log: conf.Log{
+			Level:     "debug",
+			Formatter: "text",
+			LineNum:   true,
+			FileName:  "",
+		},
+	},
+}
 
 func removeTimestamp(logMessage string) string {
 	noNewLine := strings.TrimSuffix(logMessage, "\n")
@@ -18,15 +29,13 @@ func removeTimestamp(logMessage string) string {
 }
 
 func TestNew(t *testing.T) {
+	conf.C = config
 	var expectedLogMessage string
 	var actualLogMessage string
 
 	var b bytes.Buffer
-	v := viper.New()
-
-	v.Set(LevelKey, "debug")
-	l := NewLogger(v)
-	l.Out = &b
+	l := NewLogger()
+	l.SetOut(&b)
 
 	l.Prefix("test").WithFields(logrus.Fields{"key": "value", "env": "test testing"}).Info("Information")
 	expectedLogMessage = `level=info msg=Information env="test testing" key=value prefix=test`
@@ -54,26 +63,29 @@ func TestNew(t *testing.T) {
 	b.Reset()
 }
 
-func TestSetPrefix(t *testing.T) {
-	v := viper.New()
-	v.Set(LevelKey, "Info")
-	l := NewLogger(v)
-	l.SetPrefix("test")
-	actualPrefix := l.GetPrefix()
-	expectedPrefix := "test"
-	if actualPrefix != expectedPrefix {
-		t.Errorf("Expected '%v', but got '%v", expectedPrefix, actualPrefix)
+func TestSetLineNum(t *testing.T) {
+	l := NewLogger()
+	l.SetLineNum(false)
+	actualValue := l.GetLineNum()
+	expectedValue := false
+	if actualValue != expectedValue {
+		t.Errorf("Expected '%v', but got '%v", expectedValue, actualValue)
+	}
+
+	l.SetLineNum(true)
+	actualValue = l.GetLineNum()
+	expectedValue = true
+	if actualValue != expectedValue {
+		t.Errorf("Expected '%v', but got '%v", expectedValue, actualValue)
 	}
 }
 
 func TestSetOut(t *testing.T) {
-	v := viper.New()
-	v.Set(LevelKey, "Info")
-	l := NewLogger(v)
+	l := NewLogger()
 	l.SetOut(os.Stdout)
-	actualPrefix := l.GetOut()
-	expectedPrefix := os.Stdout
-	if actualPrefix != expectedPrefix {
-		t.Errorf("Expected '%v', but got '%v", expectedPrefix, actualPrefix)
+	actualValue := l.GetOut()
+	expectedValue := os.Stdout
+	if actualValue != expectedValue {
+		t.Errorf("Expected '%v', but got '%v", expectedValue, actualValue)
 	}
 }

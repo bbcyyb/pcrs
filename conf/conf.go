@@ -74,8 +74,9 @@ func initConfig(configFile string, c interface{}) {
 
 }
 
-var C Config
+var C *Config
 
 func Setup(configFile string) {
-	initConfig(configFile, &C)
+	C = &Config{}
+	initConfig(configFile, C)
 }
