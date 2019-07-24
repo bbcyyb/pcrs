@@ -95,6 +95,11 @@ func (s *Suite) TestLog() {
 	ass.Equal(s.expectedInfoMsg, actualLogMessage)
 	b.Reset()
 
+	s.l.Print( "info")
+	actualLogMessage = removeTimestamp(b.String())
+	ass.Equal(s.expectedInfoMsg, actualLogMessage)
+	b.Reset()
+
 	s.l.Warn( "warn")
 	actualLogMessage = removeTimestamp(b.String())
 	ass.Equal(s.expectedWarningMsg, actualLogMessage)
@@ -122,6 +127,11 @@ func (s *Suite) TestLog() {
 	ass.Equal(s.expectedInfoMsg, actualLogMessage)
 	b.Reset()
 
+	s.l.Printf("%s", "infof")
+	actualLogMessage = removeTimestamp(b.String())
+	ass.Equal(s.expectedInfoMsg, actualLogMessage)
+	b.Reset()
+
 	s.l.Warnf("%s", "warnf")
 	actualLogMessage = removeTimestamp(b.String())
 	ass.Equal(s.expectedWarningMsg, actualLogMessage)
@@ -145,6 +155,12 @@ func (s *Suite) TestLog() {
 	b.Reset()
 
 	s.l.Infof("%s", "infof")
+	actualLogMessage = removeTimestamp(b.String())
+	contain = strings.Contains(actualLogMessage, s.expectedInfoMsg)
+	s.True(contain)
+	b.Reset()
+
+	s.l.Printf("%s", "infof")
 	actualLogMessage = removeTimestamp(b.String())
 	contain = strings.Contains(actualLogMessage, s.expectedInfoMsg)
 	s.True(contain)

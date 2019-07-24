@@ -156,6 +156,15 @@ func (logger *Logger) Infof(format string, args ...interface{}) {
 	}
 }
 
+func (logger *Logger) Printf(format string, args ...interface{}) {
+	if logger.lineNum {
+		line, info := logger.getCallerLineNum()
+		logger.log.WithField(line, info).Printf(format, args...)
+	} else {
+		logger.log.Printf(format, args...)
+	}
+}
+
 func (logger *Logger) Warnf(format string, args ...interface{}) {
 	if logger.lineNum {
 		line, info := logger.getCallerLineNum()
@@ -189,6 +198,15 @@ func (logger *Logger) Debug(args ...interface{}) {
 		logger.log.WithField(line, info).Debug(args...)
 	} else {
 		logger.log.Debug(args...)
+	}
+}
+
+func (logger *Logger) Print(args ...interface{}) {
+	if logger.lineNum {
+		line, info := logger.getCallerLineNum()
+		logger.log.WithField(line, info).Print(args...)
+	} else {
+		logger.log.Print(args...)
 	}
 }
 
