@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Authentication(parser pkgJ.IJWTParser) gin.HandlerFunc {
+func Authentication(parser pkgJ.IJwtParser) gin.HandlerFunc {
 	logger.Log.Debug("Register middleware Authentication")
 	return func(c *gin.Context) {
 		if err := verify(c, parser); err != nil {
@@ -22,7 +22,7 @@ func Authentication(parser pkgJ.IJWTParser) gin.HandlerFunc {
 	}
 }
 
-func verify(c *gin.Context, jwt pkgJ.IJWTParser) (err error) {
+func verify(c *gin.Context, jwt pkgJ.IJwtParser) (err error) {
 	logger.Log.Info("Start to JWT Authenticate.")
 	var code common.Code
 	jwt.SetJwtSecret([]byte("DELLEMC"))

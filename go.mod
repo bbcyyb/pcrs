@@ -9,6 +9,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.4.0
 	github.com/golang-migrate/migrate/v4 v4.4.0
+	github.com/google/wire v0.3.0
 	github.com/jinzhu/gorm v1.9.10
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5

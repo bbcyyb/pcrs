@@ -5,10 +5,10 @@ import (
 )
 
 type Token struct {
-	jwt *jwt.JWT
+	jwt *jwt.Jwt
 }
 
-func NewToken(jwt *jwt.JWT) *Token {
+func NewToken(jwt *jwt.Jwt) *Token {
 	return &Token{
 		jwt: jwt,
 	}

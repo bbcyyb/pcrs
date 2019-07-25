@@ -10,13 +10,17 @@ var (
 	defaultJwtSecret []byte = []byte("DELLEMC")
 )
 
-type JWT struct {
+type Jwt struct {
 	jwtSecret []byte
 }
 
-type IJWTParser interface {
+type IJwtParser interface {
 	Parse(string) (*Claims, error)
 	SetJwtSecret([]byte)
+}
+
+type IJwtGenerator interface {
+	Generate(*Claims) (string, error)
 }
 
 type Claims struct {
@@ -29,16 +33,11 @@ type Claims struct {
 	jg.StandardClaims
 }
 
-type JWTHandler interface {
-	Generate(*Claims) (string, error)
-	Parse(string) (*Claims, error)
+func NewJwt() *Jwt {
+	return &Jwt{}
 }
 
-func NewJWT() *JWT {
-	return &JWT{}
-}
-
-func (j *JWT) Generate(claims *Claims) (token string, err error) {
+func (j *Jwt) Generate(claims *Claims) (token string, err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -59,7 +58,7 @@ func (j *JWT) Generate(claims *Claims) (token string, err error) {
 	return
 }
 
-func (j *JWT) Parse(token string) (*Claims, error) {
+func (j *Jwt) Parse(token string) (*Claims, error) {
 	tokenClaims, err := jg.ParseWithClaims(token, &Claims{}, func(token *jg.Token) (interface{}, error) {
 		return j.jwtSecret, nil
 	})
@@ -78,6 +77,6 @@ func (j *JWT) Parse(token string) (*Claims, error) {
 	return nil, err
 }
 
-func (j *JWT) SetJwtSecret(jwtSecret []byte) {
+func (j *Jwt) SetJwtSecret(jwtSecret []byte) {
 	j.jwtSecret = jwtSecret
 }

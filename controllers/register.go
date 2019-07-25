@@ -15,7 +15,7 @@ func Register(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 
 func registerMiscellaneous(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	logger.Log.Debug("Register Miscellaneous route handler")
-	j := jwt.NewJWT()
+	j := jwt.NewJwt()
 	j.SetJwtSecret([]byte("DELLEMC"))
 	tokenSvc := services.NewToken(j)
 	miscController := NewMiscllaneous(tokenSvc)
