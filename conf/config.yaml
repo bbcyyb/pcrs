@@ -1,5 +1,6 @@
 db:
-    server: 10.35.83.61:1433
+    server: 10.35.83.61
+    port: 1433
     user: PowerCalc
     password: Power@1433
     database: PowerCalcFor46
