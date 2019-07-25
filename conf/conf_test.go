@@ -19,7 +19,8 @@ func TestConfSuite(t *testing.T) {
 func (suite *ConfTestSuite) SetupSuite() {
 	suite.ExpectedConfig = &Config{
 		DB: Database{
-			Server:   "10.35.83.61:1433",
+			Server:   "10.35.83.61",
+			Port:     1433,
 			User:     "PowerCalc",
 			Password: "Power@1433",
 			Database: "PowerCalcFor46",

@@ -1,7 +1,9 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
+	"github.com/bbcyyb/pcrs/conf"
 	"time"
 
 	"github.com/bbcyyb/pcrs/pkg/logger"
@@ -14,77 +16,121 @@ type Connection struct {
 	Db *gorm.DB
 }
 
+const (
+	dbType = "mssql"
+)
+
 var DbConnection *Connection
 
-func init() {
-	DbConnection = Setup()
+// SQLCommon is the minimal database connection functionality.
+type SQLCommon interface {
+	QuerySingle(result interface{}, query string, args ...interface{}) bool
+	QueryMany(resList []interface{}, query string, args ...interface{}) bool
+	Exec(query string, args ...interface{}) (sql.Result, bool)
+	ExecTx(query string, args ...interface{}) (sql.Result, bool)
 }
 
-func Setup() *Connection {
-	var (
-		err                                               error
-		dbType, dbName, user, password, host, tablePrefix string
-		port                                              int
-	)
-	dbType = "mssql"
-	dbName = "PowerCalc"
-	user = "PowerCalc"
-	password = "Power@1433"
-	port = 1433
-	host = "10.35.83.61"
-	tablePrefix = "blog_"
+func Setup() {
+	DbConnection = NewConnection()
+}
 
+func NewConnection() *Connection {
 	connectionString := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s",
-		host, user, password, port, dbName)
+		conf.C.DB.Server, conf.C.DB.User, conf.C.DB.Password, conf.C.DB.Port, conf.C.DB.Database)
 	db, err := gorm.Open(dbType, connectionString)
-
 	if err != nil {
-		logger.Log.Error(err)
+		logger.Log.Errorf("connect string:%v, dbType:%v,  err:%v", connectionString, dbType, err)
 		panic("failed to connect database")
-	}
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return tablePrefix + defaultTableName
 	}
 
 	db.SingularTable(true)
-
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
+	db.DB().SetConnMaxLifetime(time.Hour)
 	logger.Log.Info("connect mssql ....")
 
-	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampForCreateCallback)
-	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
-	// db.Callback().Create().Get("gorm:create")
-	// db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
-	// db.Callback().Query()
 	return &Connection{db}
 }
 
-func CloseDB() {
-	defer DbConnection.Db.Close()
+func (c *Connection) CloseDB() {
+	defer c.Db.Close()
 }
 
-// updateTimeStampForCreateCallback will set `CreatedOn`, `ModifiedOn` when creating
-func updateTimeStampForCreateCallback(scope *gorm.Scope) {
-	if !scope.HasError() {
-		nowTime := time.Now().Unix()
-		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
-			if createTimeField.IsBlank {
-				createTimeField.Set(nowTime)
-			}
-		}
-
-		if modifyTimeField, ok := scope.FieldByName("ModifiedOn"); ok {
-			if modifyTimeField.IsBlank {
-				modifyTimeField.Set(nowTime)
-			}
-		}
-	}
+func (c *Connection) query(query string, args ...interface{}) (*sql.Rows, error) {
+	return c.Db.DB().Query(query, args)
 }
 
-// updateTimeStampForUpdateCallback will set `ModifyTime` when updating
-func updateTimeStampForUpdateCallback(scope *gorm.Scope) {
-	if _, ok := scope.Get("gorm:update_column"); !ok {
-		scope.SetColumn("ModifiedOn", time.Now().Unix())
+func (c *Connection) queryRow(query string, args ...interface{}) *sql.Row {
+	return c.Db.DB().QueryRow(query, args)
+}
+
+func (c *Connection) exec(query string, args ...interface{}) (sql.Result, error) {
+	return c.Db.DB().Exec(query, args)
+}
+
+// Query single
+func (c *Connection) QuerySingle(result interface{}, query string, args ...interface{}) bool {
+	err := c.queryRow(query, args).Scan(&result)
+	if err != nil {
+		logger.Log.Errorf("occur query error, with sql:%v, error:%v", query, err)
+		return false
 	}
+	return true
+}
+
+// Query Many
+func (c *Connection) QueryMany(resList []interface{}, query string, args ...interface{}) bool {
+	rows, err := c.query(query, args)
+	if err != nil {
+		logger.Log.Errorf("occur query error, with sql:%v, error:%v", query, err)
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var res interface{}
+		err = c.Db.ScanRows(rows, &res)
+		if err != nil {
+			logger.Log.Errorf("scanRows error, with sql:%v, error:%v", query, err)
+			return false
+		}
+		resList = append(resList, res)
+	}
+	return true
+}
+
+// Create/Update/Delete
+func (c *Connection) Exec(query string, args ...interface{}) (sql.Result, bool) {
+	res, err := c.exec(query, args)
+	if err != nil {
+		logger.Log.Errorf("fail to execute sql:%v， error:%v", query, err)
+		return nil, false
+	}
+	return res, true
+}
+
+func (c *Connection) ExecTx(query string, args ...interface{}) (sql.Result, bool) {
+	tx := c.Db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		logger.Log.Errorf("create tx failed, with error:%v", err)
+		return nil, false
+	}
+
+	res, err := tx.DB().Exec(query, args)
+	if err != nil {
+		tx.Rollback()
+		logger.Log.Errorf("execute tx failed, with error:%v", err)
+		return nil, false
+	}
+	err = tx.Commit().Error
+	if err != nil {
+		logger.Log.Errorf("commit tx failed, with error:%v", err)
+		return nil, false
+	}
+	return res, true
 }
