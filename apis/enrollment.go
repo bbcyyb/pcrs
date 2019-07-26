@@ -12,5 +12,11 @@ func Enroll(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 }
 
 func enrollMisc(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
-	initializeMisc()
+	controller, _ := initializeMisc()
+
+	miscG := group.Group("/miscs")
+	miscG.POST("tokens", controller.GenerateTestToken)
+
+	miscAg := authGroup.Group("/miscs")
+	miscAg.GET("/test", controller.Test)
 }

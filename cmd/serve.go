@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/bbcyyb/pcrs/controllers"
+	"github.com/bbcyyb/pcrs/apis"
 	"github.com/bbcyyb/pcrs/middlewares"
 	"github.com/bbcyyb/pcrs/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ var serveCmd = &cobra.Command{
 		// The middlewares must be registered before controllers register
 		middlewares.Enroll(group, authGroup)
 
-		controllers.Register(group, authGroup)
+		apis.Enroll(group, authGroup)
 
 		address := "0.0.0.0:8080"
 		logger.Log.Info("Start WebApplication through gin-gonic/gin ", address)

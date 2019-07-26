@@ -2,6 +2,8 @@ package misc
 
 import (
 	"context"
+	"time"
+
 	"github.com/bbcyyb/pcrs/pkg/jwt"
 )
 
@@ -18,7 +20,7 @@ type MiscService struct {
 	jwtGenerator jwt.IJwtGenerator
 }
 
-func NewMiscService(generator jwt.IJwtGenerator) *MiscService {
+func NewMiscService(generator jwt.IJwtGenerator) IService {
 	return &MiscService{
 		jwtGenerator: generator,
 	}

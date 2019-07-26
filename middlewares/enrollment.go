@@ -15,7 +15,7 @@ func Enroll(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	group.Use(ErrorHandler())
 
 	if conf.C.Middleware.Authentication.Enable {
-		jwt := pkgJ.NewJwt()
+		jwt := pkgJ.NewJwtParser()
 		authGroup.Use(Authentication(jwt))
 	}
 

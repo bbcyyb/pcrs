@@ -1,8 +1,6 @@
 package misc
 
 import (
-	"time"
-
 	"github.com/bbcyyb/pcrs/common"
 	"github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/gin-gonic/gin"
@@ -13,7 +11,7 @@ type MiscController struct {
 }
 
 func NewMiscController(service IService) *MiscController {
-	return &MIscController{
+	return &MiscController{
 		Service: service,
 	}
 }

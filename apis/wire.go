@@ -6,8 +6,6 @@ import (
 	"github.com/google/wire"
 )
 
-var superSet = wire.NewSet(misc.NewMiscController, wire.Bind(new(misc.IService), misc.NewMiscService()), jwt.NewJwt)
-
 func initializeMisc() (*misc.MiscController, error) {
-	panic(wire.Build(superSet))
+	panic(wire.Build(misc.NewMiscController, misc.NewMiscService, jwt.NewJwtGenerator))
 }

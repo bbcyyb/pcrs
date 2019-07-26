@@ -33,7 +33,11 @@ type Claims struct {
 	jg.StandardClaims
 }
 
-func NewJwt() *Jwt {
+func NewJwtParser() IJwtParser {
+	return &Jwt{}
+}
+
+func NewJwtGenerator() IJwtGenerator {
 	return &Jwt{}
 }
 
