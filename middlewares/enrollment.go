@@ -11,8 +11,13 @@ import (
 func Enroll(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	logger.Log.Info("Register middlewares")
 
-	authGroup.Use(ErrorHandler())
-	group.Use(ErrorHandler())
+	//TODO: put gzip middware in here
+	//Reference: https://github.com/gin-contrib/gzip/blob/master/gzip.go
+
+	if conf.C.Middleware.ErrorHandler.Enable {
+		authGroup.Use(ErrorHandler())
+		group.Use(ErrorHandler())
+	}
 
 	if conf.C.Middleware.Authentication.Enable {
 		jwt := pkgJ.NewJwtParser()
@@ -22,10 +27,5 @@ func Enroll(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	if conf.C.Middleware.Authorization.Enable {
 		authorizer := pkgA.NewBasicAuthorizer()
 		authGroup.Use(Authorization(authorizer))
-	}
-
-	if conf.C.Middleware.ErrorHandler.Enable {
-		authGroup.Use(ErrorHandler())
-		group.Use(ErrorHandler())
 	}
 }

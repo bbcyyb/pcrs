@@ -34,5 +34,7 @@ var serveCmd = &cobra.Command{
 }
 
 func init() {
+	serveCmd.PersistentFlags().BoolP("verbose", "v", false, "make output more verbose")
+
 	rootCmd.AddCommand(serveCmd)
 }

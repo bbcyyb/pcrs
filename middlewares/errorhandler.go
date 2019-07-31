@@ -11,6 +11,7 @@ import (
 func ErrorHandler() gin.HandlerFunc {
 	logger.Log.Debug("Register middleware ResponseHandler")
 	return func(c *gin.Context) {
+
 		c.Next()
 
 		status := c.Writer.Status()
