@@ -3,11 +3,10 @@ package authorizer
 import (
 	"net/http"
 	"path"
-	"runtime"
 	"testing"
 
 	"github.com/bbcyyb/pcrs/common"
-	"github.com/bbcyyb/pcrs/pkg"
+	"github.com/bbcyyb/pcrs/conf"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -32,12 +31,14 @@ func (suite *AuthorizerTestSuite) SetupSuite() {
 	ass := suite.Assert()
 
 	dir := common.BuildRunningPath("")
-	pkg.C = &pkg.Config{
-		AuthPolicyFile: path.Join(dir, "auth_policy_test.csv"),
-		AuthModelFile:  path.Join(dir, "auth_model_test.conf"),
+	conf.C = &conf.Config{}
+	conf.C.Pkg.Authorizer = conf.Authorizer{
+		Policy: path.Join(dir, "auth_policy_test.csv"),
+		Model:  path.Join(dir, "auth_model_test.conf"),
 	}
 
-	ass.FileExists(pkg.C.AuthModelFile)
+	ass.FileExists(conf.C.Pkg.Authorizer.Model)
+	ass.FileExists(conf.C.Pkg.Authorizer.Policy)
 
 	suite.Auth = NewBasicAuthorizer()
 	ass.NotNil(suite.Auth)

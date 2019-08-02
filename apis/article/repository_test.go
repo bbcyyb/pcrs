@@ -1,10 +1,9 @@
-package repository
+package article
 
 import (
 	"context"
 	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/bbcyyb/pcrs/article"
 	"github.com/bbcyyb/pcrs/models"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/require"

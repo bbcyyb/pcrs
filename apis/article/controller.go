@@ -1,17 +1,16 @@
-package controller
+package article
 
 import (
-	"github.com/bbcyyb/pcrs/article"
 	"github.com/gin-gonic/gin"
 )
 
 type ArticleController struct {
-	AService article.IService
+	Service IService
 }
 
-func NewArticleController(service article.IService) *ArticleController {
+func NewArticleController(service IService) *ArticleController {
 	return &ArticleController{
-		AService: service,
+		Service: service,
 	}
 }
 

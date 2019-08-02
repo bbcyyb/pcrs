@@ -11,7 +11,7 @@ import (
 type JWTTestSuite struct {
 	suite.Suite
 
-	JWT    *JWT
+	Jwt    *Jwt
 	Claims Claims
 	Token  string
 }
@@ -22,9 +22,7 @@ func TestJWTSuite(t *testing.T) {
 
 func (suite *JWTTestSuite) SetupSuite() {
 
-	suite.JWT = NewJWT()
-	suite.JWT.SetJwtSecret([]byte("DELLEMC"))
-	//suite.JWT.SetJwtSecret([]byte("bbcyyb"))
+	suite.Jwt = &Jwt{}
 
 	claims := Claims{
 		Id:       111,
@@ -41,13 +39,13 @@ func (suite *JWTTestSuite) SetupSuite() {
 	claims.Issuer = "powercalculator"
 
 	suite.Claims = claims
-	suite.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTExLCJyaWQiOiI0QjlDOTc0N0QwQzMyOEFEQjA2Nzg4REQ2MUMyRDY1OERBRTJDMEIzMDFDNjI5QUUwMjkzNjkxNjgwNUE3OTU3QjNCREUxN0JDODZENDE3RjFBMTY5MzREM0NDMkVCQjVCODI1QjY0MjM4QzNDOENBM0M3MDY4RDkxQUZEMEJCREVBMDExODdGQTdDMzQ1QzYzNTdBOTcwM0JFMkVGNTg3RTVFMTI4MUI2RkE3MzYzNENFNDZBQjM3ODMwQkRFQzEiLCJ1biI6IkRldiIsImVtIjoiZGV2QGRlbGwuY29tIiwidXIiOjIsImRlIjowLCJleHAiOjE2MDExOTU0MDAsImlzcyI6InBvd2VyY2FsY3VsYXRvciJ9.sQPjfOM1UCZehjEcN45SRQtcMSbi-DY1zWFivkADXL8"
+	suite.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTExLCJyaWQiOiI0QjlDOTc0N0QwQzMyOEFEQjA2Nzg4REQ2MUMyRDY1OERBRTJDMEIzMDFDNjI5QUUwMjkzNjkxNjgwNUE3OTU3QjNCREUxN0JDODZENDE3RjFBMTY5MzREM0NDMkVCQjVCODI1QjY0MjM4QzNDOENBM0M3MDY4RDkxQUZEMEJCREVBMDExODdGQTdDMzQ1QzYzNTdBOTcwM0JFMkVGNTg3RTVFMTI4MUI2RkE3MzYzNENFNDZBQjM3ODMwQkRFQzEiLCJ1biI6IkRldiIsImVtIjoiZGV2QGRlbGwuY29tIiwidXIiOjIsImRlIjowLCJleHAiOjE2MDEyMzg2MDAsImlzcyI6InBvd2VyY2FsY3VsYXRvciJ9.CWs28BcjrJl0C3fbW56Ek4O__UZAz1aWnCF8Ffrs6hY"
 }
 
 func (suite *JWTTestSuite) TestGenerateToken() {
 	ass := suite.Assert()
 
-	token, err := suite.JWT.Generate(&(suite.Claims))
+	token, err := suite.Jwt.Generate(&(suite.Claims))
 
 	if ass.Nil(err) {
 		ass.Equal(suite.Token, token)
@@ -57,7 +55,7 @@ func (suite *JWTTestSuite) TestGenerateToken() {
 func (suite *JWTTestSuite) TestGenerateTokenFailed() {
 	ass := suite.Assert()
 
-	token, err := suite.JWT.Generate(nil)
+	token, err := suite.Jwt.Generate(nil)
 
 	ass.Error(err)
 	ass.Empty(token)
@@ -65,7 +63,7 @@ func (suite *JWTTestSuite) TestGenerateTokenFailed() {
 
 func (suite *JWTTestSuite) TestParseToken() {
 	ass := suite.Assert()
-	claims, err := suite.JWT.Parse(suite.Token)
+	claims, err := suite.Jwt.Parse(suite.Token)
 	expectedClaims := suite.Claims
 
 	if ass.Nil(err) {
@@ -78,7 +76,7 @@ func (suite *JWTTestSuite) TestParseTokenFailed() {
 
 	incorrectToken := suite.Token + "123"
 
-	if claims, err := suite.JWT.Parse(incorrectToken); ass.Nil(claims) && ass.Error(err) {
+	if claims, err := suite.Jwt.Parse(incorrectToken); ass.Nil(claims) && ass.Error(err) {
 		ass.Equal("signature is invalid", err.Error())
 	}
 }
