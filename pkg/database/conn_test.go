@@ -66,8 +66,8 @@ func (s *Suite) TestExec() {
 	query := `Delete articles Where [id] = 1"`
 	s.mockDB.ExpectExec("Delete articles").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	res, success := s.c.Exec(query)
-	s.True(success)
+	res, err := s.c.Exec(query)
+	s.Nil(err)
 	s.NotNil(res)
 	id, _ := res.LastInsertId()
 	rowAffected, _ := res.RowsAffected()

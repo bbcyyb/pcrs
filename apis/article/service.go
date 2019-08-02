@@ -20,7 +20,7 @@ type ArticleService struct {
 }
 
 // NewArticleService will create new an ArticleService object representation of article.Service interface
-func NewArticleService(repo IRepository) *ArticleService {
+func NewArticleService(repo IRepository) IService {
 	return &ArticleService{
 		Repo: repo,
 	}
