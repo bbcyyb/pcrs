@@ -18,11 +18,11 @@ import (
 type SQLCommon interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	QueryRow(query string, args ...interface{}) *sql.Row
-	Exec(query string, args ...interface{}) (sql.Result, bool)
+	Exec(query string, args ...interface{}) (sql.Result, error)
 	// Transactional execution
-	ExecTx(query string, args ...interface{}) (sql.Result, bool)
-	QuerySingle(result interface{}, query string, args ...interface{}) bool
-	QueryMany(resList []interface{}, query string, args ...interface{}) bool
+	ExecTx(query string, args ...interface{}) (sql.Result, error)
+	QuerySingle(result interface{}, query string, args ...interface{}) error
+	QueryMany(resList []interface{}, query string, args ...interface{}) error
 }
 
 // SqlRows is the sql.Rows interface
@@ -86,50 +86,51 @@ func (c *Conn) QueryRow(query string, args ...interface{}) *sql.Row {
 }
 
 // Query single
-func (c *Conn) QuerySingle(result interface{}, query string, args ...interface{}) bool {
+func (c *Conn) QuerySingle(result interface{}, query string, args ...interface{}) error {
 	rows, err := c.Query(query, args...)
 	if err != nil {
 		logger.Log.Errorf("occur Query error, with sql:%v, error:%v", query, err)
-		return false
+		return err
 	}
 	defer rows.Close()
 	c.rows = rows
 	c.scanRow(result)
 	if err != nil {
 		logger.Log.Errorf("QuerySingle error, with sql:%v, error:%v", query, err)
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 // Query Many
-func (c *Conn) QueryMany(resList interface{}, query string, args ...interface{}) bool {
+func (c *Conn) QueryMany(resList interface{}, query string, args ...interface{}) error {
 	rows, err := c.Query(query, args...)
 	if err != nil {
 		logger.Log.Errorf("occur Query error, with sql:%v, error:%v", query, err)
-		return false
+		return err
 	}
 	defer rows.Close()
 	c.rows = rows
 	c.scanRow(resList)
 	if err != nil {
 		logger.Log.Errorf("QueryMany error, with sql:%v, error:%v", query, err)
-		return false
+		resList = nil
+		return err
 	}
-	return true
+	return nil
 }
 
 // Create/Update/Delete
-func (c *Conn) Exec(query string, args ...interface{}) (sql.Result, bool) {
+func (c *Conn) Exec(query string, args ...interface{}) (sql.Result, error) {
 	res, err := c.exec(query, args...)
 	if err != nil {
 		logger.Log.Errorf("fail to execute sql:%v， error:%v", query, err)
-		return nil, false
+		return nil, err
 	}
-	return res, true
+	return res, nil
 }
 
-func (c *Conn) ExecTx(query string, args ...interface{}) (sql.Result, bool) {
+func (c *Conn) ExecTx(query string, args ...interface{}) (sql.Result, error) {
 	tx := c.Db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -139,21 +140,21 @@ func (c *Conn) ExecTx(query string, args ...interface{}) (sql.Result, bool) {
 
 	if err := tx.Error; err != nil {
 		logger.Log.Errorf("create tx failed, with error:%v", err)
-		return nil, false
+		return nil, err
 	}
 
 	res, err := tx.CommonDB().Exec(query, args...)
 	if err != nil {
 		tx.Rollback()
 		logger.Log.Errorf("execute tx failed, with error:%v", err)
-		return nil, false
+		return nil, err
 	}
 	err = tx.Commit().Error
 	if err != nil {
 		logger.Log.Errorf("commit tx failed, with error:%v", err)
-		return nil, false
+		return nil, err
 	}
-	return res, true
+	return res, nil
 }
 
 func (c *Conn) exec(query string, args ...interface{}) (sql.Result, error) {

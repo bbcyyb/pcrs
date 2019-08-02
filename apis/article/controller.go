@@ -5,27 +5,27 @@ import (
 )
 
 type ArticleController struct {
-	Service IService
+	ArticleService IService
 }
 
 func NewArticleController(service IService) *ArticleController {
 	return &ArticleController{
-		Service: service,
+		ArticleService: service,
 	}
 }
 
-func (a *ArticleController) Get(c *gin.Context) error {
+func (a *ArticleController) Get(c *gin.Context) {
 	panic("implement me")
 }
 
-func (a *ArticleController) Create(c *gin.Context) error {
+func (a *ArticleController) Create(c *gin.Context) {
 	panic("implement me")
 }
 
-func (a *ArticleController) Post(c *gin.Context) error {
+func (a *ArticleController) GetById(c *gin.Context) {
 	panic("implement me")
 }
 
-func (a *ArticleController) Delete(c *gin.Context) error {
+func (a *ArticleController) Delete(c *gin.Context) {
 	panic("implement me")
 }

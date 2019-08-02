@@ -6,6 +6,7 @@
 package apis
 
 import (
+	"github.com/bbcyyb/pcrs/apis/article"
 	"github.com/bbcyyb/pcrs/apis/misc"
 	"github.com/bbcyyb/pcrs/pkg/jwt"
 )
@@ -17,4 +18,11 @@ func initializeMisc() (*misc.MiscController, error) {
 	iService := misc.NewMiscService(iJwtGenerator)
 	miscController := misc.NewMiscController(iService)
 	return miscController, nil
+}
+
+func initializeArticle() (*article.ArticleController, error) {
+	iRepository := article.NewArticleRepository()
+	iService := article.NewArticleService(iRepository)
+	articleController := article.NewArticleController(iService)
+	return articleController, nil
 }

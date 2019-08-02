@@ -4,6 +4,7 @@
 package apis
 
 import (
+	"github.com/bbcyyb/pcrs/apis/article"
 	"github.com/bbcyyb/pcrs/apis/misc"
 	"github.com/bbcyyb/pcrs/pkg/jwt"
 	"github.com/google/wire"
@@ -11,4 +12,8 @@ import (
 
 func initializeMisc() (*misc.MiscController, error) {
 	panic(wire.Build(misc.NewMiscController, misc.NewMiscService, jwt.NewJwtGenerator))
+}
+
+func initializeArticle() (*article.ArticleController, error) {
+	panic(wire.Build(article.NewArticleController, article.NewArticleService, article.NewArticleRepository))
 }

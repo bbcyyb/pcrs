@@ -11,6 +11,16 @@ func Enroll(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	enrollMisc(group, authGroup)
 }
 
+func enrollArticle(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
+	controller, _ := initializeArticle()
+
+	r := authGroup.Group("/articles")
+	r.GET("/", controller.Get)
+	r.GET("/{id}", controller.GetById)
+	r.POST("/", controller.Create)
+	r.DELETE("/{id}", controller.Delete)
+}
+
 func enrollMisc(group *gin.RouterGroup, authGroup *gin.RouterGroup) {
 	controller, _ := initializeMisc()
 
