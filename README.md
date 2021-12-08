@@ -1,2 +1,2 @@
 # pcrs
-The sample of PowerCalculator Restful Service
+The sample of Restful Service
